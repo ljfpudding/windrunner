@@ -1,0 +1,324 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="HighSpeedChartCtrl">
+      <UniqueIdentifier>{aeed55e5-d8a3-4c46-b6df-e0ccd6d7c549}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HighSpeedChartCtrl\头文件">
+      <UniqueIdentifier>{273d7b5f-4947-4161-8578-33ab3aec8775}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HighSpeedChartCtrl\源文件">
+      <UniqueIdentifier>{139420ef-6460-4e71-8906-ed399b5f9953}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CTP-MFC.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CTP-MFCDlg.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CtpAPILibrary\ThostFtdcMdApi.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CtpAPILibrary\ThostFtdcTraderApi.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CtpAPILibrary\ThostFtdcUserApiDataType.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CtpAPILibrary\ThostFtdcUserApiStruct.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="VolumeIndicatorMD.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="getconfig.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ThreadWorkLogic.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ProducerConsumer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="atomicops.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="readerwriterqueue.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="strategy.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HighSpeedChartCtrl\ChartAxis.h">
+      <Filter>HighSpeedChartCtrl\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HighSpeedChartCtrl\ChartAxisLabel.h">
+      <Filter>HighSpeedChartCtrl\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HighSpeedChartCtrl\ChartBalloonLabel.h">
+      <Filter>HighSpeedChartCtrl\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HighSpeedChartCtrl\ChartBarSerie.h">
+      <Filter>HighSpeedChartCtrl\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HighSpeedChartCtrl\ChartCandlestickSerie.h">
+      <Filter>HighSpeedChartCtrl\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HighSpeedChartCtrl\ChartCrossHairCursor.h">
+      <Filter>HighSpeedChartCtrl\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HighSpeedChartCtrl\ChartCtrl.h">
+      <Filter>HighSpeedChartCtrl\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HighSpeedChartCtrl\ChartCursor.h">
+      <Filter>HighSpeedChartCtrl\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HighSpeedChartCtrl\ChartDateTimeAxis.h">
+      <Filter>HighSpeedChartCtrl\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HighSpeedChartCtrl\ChartDragLineCursor.h">
+      <Filter>HighSpeedChartCtrl\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HighSpeedChartCtrl\ChartFont.h">
+      <Filter>HighSpeedChartCtrl\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HighSpeedChartCtrl\ChartGanttSerie.h">
+      <Filter>HighSpeedChartCtrl\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HighSpeedChartCtrl\ChartGradient.h">
+      <Filter>HighSpeedChartCtrl\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HighSpeedChartCtrl\ChartGrid.h">
+      <Filter>HighSpeedChartCtrl\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HighSpeedChartCtrl\ChartLabel.h">
+      <Filter>HighSpeedChartCtrl\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HighSpeedChartCtrl\ChartLegend.h">
+      <Filter>HighSpeedChartCtrl\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HighSpeedChartCtrl\ChartLineSerie.h">
+      <Filter>HighSpeedChartCtrl\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HighSpeedChartCtrl\ChartLogarithmicAxis.h">
+      <Filter>HighSpeedChartCtrl\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HighSpeedChartCtrl\ChartMouseListener.h">
+      <Filter>HighSpeedChartCtrl\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HighSpeedChartCtrl\ChartPointsArray.h">
+      <Filter>HighSpeedChartCtrl\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HighSpeedChartCtrl\ChartPointsSerie.h">
+      <Filter>HighSpeedChartCtrl\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HighSpeedChartCtrl\ChartScrollBar.h">
+      <Filter>HighSpeedChartCtrl\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HighSpeedChartCtrl\ChartSerie.h">
+      <Filter>HighSpeedChartCtrl\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HighSpeedChartCtrl\ChartSerieBase.h">
+      <Filter>HighSpeedChartCtrl\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HighSpeedChartCtrl\ChartSeriesMouseListener.h">
+      <Filter>HighSpeedChartCtrl\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HighSpeedChartCtrl\ChartStandardAxis.h">
+      <Filter>HighSpeedChartCtrl\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HighSpeedChartCtrl\ChartString.h">
+      <Filter>HighSpeedChartCtrl\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HighSpeedChartCtrl\ChartSurfaceSerie.h">
+      <Filter>HighSpeedChartCtrl\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HighSpeedChartCtrl\ChartTitle.h">
+      <Filter>HighSpeedChartCtrl\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HighSpeedChartCtrl\ChartXYSerie.h">
+      <Filter>HighSpeedChartCtrl\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HighSpeedChartCtrl\PointsOrdering.h">
+      <Filter>HighSpeedChartCtrl\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HighSpeedChartCtrl\ColourPicker.h">
+      <Filter>HighSpeedChartCtrl\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="HighSpeedChartCtrl\ColourPopup.h">
+      <Filter>HighSpeedChartCtrl\头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="traderApi.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="traderSpi.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="define.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="CTP-MFC.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CTP-MFCDlg.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="VolumeIndicatorMD.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="getconfig.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ThreadWorkLogic.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ProducerConsumer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="strategy.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="HighSpeedChartCtrl\ChartAxis.cpp">
+      <Filter>HighSpeedChartCtrl\源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="HighSpeedChartCtrl\ChartAxisLabel.cpp">
+      <Filter>HighSpeedChartCtrl\源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="HighSpeedChartCtrl\ChartBarSerie.cpp">
+      <Filter>HighSpeedChartCtrl\源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="HighSpeedChartCtrl\ChartCandlestickSerie.cpp">
+      <Filter>HighSpeedChartCtrl\源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="HighSpeedChartCtrl\ChartCrossHairCursor.cpp">
+      <Filter>HighSpeedChartCtrl\源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="HighSpeedChartCtrl\ChartCtrl.cpp">
+      <Filter>HighSpeedChartCtrl\源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="HighSpeedChartCtrl\ChartCursor.cpp">
+      <Filter>HighSpeedChartCtrl\源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="HighSpeedChartCtrl\ChartDateTimeAxis.cpp">
+      <Filter>HighSpeedChartCtrl\源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="HighSpeedChartCtrl\ChartDragLineCursor.cpp">
+      <Filter>HighSpeedChartCtrl\源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="HighSpeedChartCtrl\ChartFont.cpp">
+      <Filter>HighSpeedChartCtrl\源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="HighSpeedChartCtrl\ChartGanttSerie.cpp">
+      <Filter>HighSpeedChartCtrl\源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="HighSpeedChartCtrl\ChartGradient.cpp">
+      <Filter>HighSpeedChartCtrl\源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="HighSpeedChartCtrl\ChartGrid.cpp">
+      <Filter>HighSpeedChartCtrl\源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="HighSpeedChartCtrl\ChartLegend.cpp">
+      <Filter>HighSpeedChartCtrl\源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="HighSpeedChartCtrl\ChartLineSerie.cpp">
+      <Filter>HighSpeedChartCtrl\源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="HighSpeedChartCtrl\ChartLogarithmicAxis.cpp">
+      <Filter>HighSpeedChartCtrl\源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="HighSpeedChartCtrl\ChartPointsSerie.cpp">
+      <Filter>HighSpeedChartCtrl\源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="HighSpeedChartCtrl\ChartScrollBar.cpp">
+      <Filter>HighSpeedChartCtrl\源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="HighSpeedChartCtrl\ChartSerie.cpp">
+      <Filter>HighSpeedChartCtrl\源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="HighSpeedChartCtrl\ChartStandardAxis.cpp">
+      <Filter>HighSpeedChartCtrl\源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="HighSpeedChartCtrl\ChartSurfaceSerie.cpp">
+      <Filter>HighSpeedChartCtrl\源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="HighSpeedChartCtrl\ChartTitle.cpp">
+      <Filter>HighSpeedChartCtrl\源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="HighSpeedChartCtrl\ChartXYSerie.cpp">
+      <Filter>HighSpeedChartCtrl\源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="HighSpeedChartCtrl\ColourPicker.cpp">
+      <Filter>HighSpeedChartCtrl\源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="HighSpeedChartCtrl\ColourPopup.cpp">
+      <Filter>HighSpeedChartCtrl\源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="traderApi.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="traderSpi.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="CTP-MFC.rc">
+      <Filter>资源文件</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\CTPMFC.rc2">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="config.ini">
+      <Filter>头文件</Filter>
+    </None>
+    <None Include="HighSpeedChartCtrl\ChartBalloonLabel.inl">
+      <Filter>HighSpeedChartCtrl\头文件</Filter>
+    </None>
+    <None Include="HighSpeedChartCtrl\ChartLabel.inl">
+      <Filter>HighSpeedChartCtrl\头文件</Filter>
+    </None>
+    <None Include="HighSpeedChartCtrl\ChartPointsArray.inl">
+      <Filter>HighSpeedChartCtrl\头文件</Filter>
+    </None>
+    <None Include="HighSpeedChartCtrl\ChartSerieBase.inl">
+      <Filter>HighSpeedChartCtrl\头文件</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\CTP-MFC.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+  </ItemGroup>
+</Project>

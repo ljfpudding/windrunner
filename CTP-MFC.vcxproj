@@ -1,0 +1,316 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{344D36FC-2190-4229-BC91-2E4247CEFC2C}</ProjectGuid>
+    <RootNamespace>CTPMFC</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <Keyword>MFCProj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>Dynamic</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>Dynamic</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>Dynamic</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>Dynamic</UseOfMfc>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
+    <ReferencePath>$(ReferencePath)</ReferencePath>
+    <TargetName>风行期货进击系统</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <Midl>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <ValidateAllParameters>true</ValidateAllParameters>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0804</Culture>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_WINDOWS;_DEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <AdditionalIncludeDirectories>E:\TorGit\CTP-MFC\CTP-MFC\CtpAPILibrary;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <AdditionalDependencies>thostmduserapi_se.lib;thosttraderapi_se.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>E:\TorGit\CTP-MFC\CTP-MFC\CtpAPILibrary;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <OutputFile>$(OutDir)风行期货进击系统.exe</OutputFile>
+    </Link>
+    <Midl>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <ValidateAllParameters>true</ValidateAllParameters>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0804</Culture>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <Midl>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <ValidateAllParameters>true</ValidateAllParameters>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0804</Culture>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>false</SDLCheck>
+      <AdditionalIncludeDirectories>E:\TorGit\CTP-MFC\CTP-MFC\CtpAPILibrary;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>E:\TorGit\CTP-MFC\CTP-MFC\CtpAPILibrary;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>thostmduserapi_se.lib;thosttraderapi_se.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <Midl>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <ValidateAllParameters>true</ValidateAllParameters>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0804</Culture>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="atomicops.h" />
+    <ClInclude Include="CTP-MFC.h" />
+    <ClInclude Include="CTP-MFCDlg.h" />
+    <ClInclude Include="CtpAPILibrary\ThostFtdcMdApi.h" />
+    <ClInclude Include="CtpAPILibrary\ThostFtdcTraderApi.h" />
+    <ClInclude Include="CtpAPILibrary\ThostFtdcUserApiDataType.h" />
+    <ClInclude Include="CtpAPILibrary\ThostFtdcUserApiStruct.h" />
+    <ClInclude Include="define.h" />
+    <ClInclude Include="getconfig.h" />
+    <ClInclude Include="HighSpeedChartCtrl\ChartAxis.h" />
+    <ClInclude Include="HighSpeedChartCtrl\ChartAxisLabel.h" />
+    <ClInclude Include="HighSpeedChartCtrl\ChartBalloonLabel.h" />
+    <ClInclude Include="HighSpeedChartCtrl\ChartBarSerie.h" />
+    <ClInclude Include="HighSpeedChartCtrl\ChartCandlestickSerie.h" />
+    <ClInclude Include="HighSpeedChartCtrl\ChartCrossHairCursor.h" />
+    <ClInclude Include="HighSpeedChartCtrl\ChartCtrl.h" />
+    <ClInclude Include="HighSpeedChartCtrl\ChartCursor.h" />
+    <ClInclude Include="HighSpeedChartCtrl\ChartDateTimeAxis.h" />
+    <ClInclude Include="HighSpeedChartCtrl\ChartDragLineCursor.h" />
+    <ClInclude Include="HighSpeedChartCtrl\ChartFont.h" />
+    <ClInclude Include="HighSpeedChartCtrl\ChartGanttSerie.h" />
+    <ClInclude Include="HighSpeedChartCtrl\ChartGradient.h" />
+    <ClInclude Include="HighSpeedChartCtrl\ChartGrid.h" />
+    <ClInclude Include="HighSpeedChartCtrl\ChartLabel.h" />
+    <ClInclude Include="HighSpeedChartCtrl\ChartLegend.h" />
+    <ClInclude Include="HighSpeedChartCtrl\ChartLineSerie.h" />
+    <ClInclude Include="HighSpeedChartCtrl\ChartLogarithmicAxis.h" />
+    <ClInclude Include="HighSpeedChartCtrl\ChartMouseListener.h" />
+    <ClInclude Include="HighSpeedChartCtrl\ChartPointsArray.h" />
+    <ClInclude Include="HighSpeedChartCtrl\ChartPointsSerie.h" />
+    <ClInclude Include="HighSpeedChartCtrl\ChartScrollBar.h" />
+    <ClInclude Include="HighSpeedChartCtrl\ChartSerie.h" />
+    <ClInclude Include="HighSpeedChartCtrl\ChartSerieBase.h" />
+    <ClInclude Include="HighSpeedChartCtrl\ChartSeriesMouseListener.h" />
+    <ClInclude Include="HighSpeedChartCtrl\ChartStandardAxis.h" />
+    <ClInclude Include="HighSpeedChartCtrl\ChartString.h" />
+    <ClInclude Include="HighSpeedChartCtrl\ChartSurfaceSerie.h" />
+    <ClInclude Include="HighSpeedChartCtrl\ChartTitle.h" />
+    <ClInclude Include="HighSpeedChartCtrl\ChartXYSerie.h" />
+    <ClInclude Include="HighSpeedChartCtrl\ColourPicker.h" />
+    <ClInclude Include="HighSpeedChartCtrl\ColourPopup.h" />
+    <ClInclude Include="HighSpeedChartCtrl\PointsOrdering.h" />
+    <ClInclude Include="ProducerConsumer.h" />
+    <ClInclude Include="readerwriterqueue.h" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="strategy.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="ThreadWorkLogic.h" />
+    <ClInclude Include="traderApi.h" />
+    <ClInclude Include="traderSpi.h" />
+    <ClInclude Include="VolumeIndicatorMD.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="CTP-MFC.cpp" />
+    <ClCompile Include="CTP-MFCDlg.cpp" />
+    <ClCompile Include="getconfig.cpp" />
+    <ClCompile Include="HighSpeedChartCtrl\ChartAxis.cpp" />
+    <ClCompile Include="HighSpeedChartCtrl\ChartAxisLabel.cpp" />
+    <ClCompile Include="HighSpeedChartCtrl\ChartBarSerie.cpp" />
+    <ClCompile Include="HighSpeedChartCtrl\ChartCandlestickSerie.cpp" />
+    <ClCompile Include="HighSpeedChartCtrl\ChartCrossHairCursor.cpp" />
+    <ClCompile Include="HighSpeedChartCtrl\ChartCtrl.cpp" />
+    <ClCompile Include="HighSpeedChartCtrl\ChartCursor.cpp" />
+    <ClCompile Include="HighSpeedChartCtrl\ChartDateTimeAxis.cpp" />
+    <ClCompile Include="HighSpeedChartCtrl\ChartDragLineCursor.cpp" />
+    <ClCompile Include="HighSpeedChartCtrl\ChartFont.cpp" />
+    <ClCompile Include="HighSpeedChartCtrl\ChartGanttSerie.cpp" />
+    <ClCompile Include="HighSpeedChartCtrl\ChartGradient.cpp" />
+    <ClCompile Include="HighSpeedChartCtrl\ChartGrid.cpp" />
+    <ClCompile Include="HighSpeedChartCtrl\ChartLegend.cpp" />
+    <ClCompile Include="HighSpeedChartCtrl\ChartLineSerie.cpp" />
+    <ClCompile Include="HighSpeedChartCtrl\ChartLogarithmicAxis.cpp" />
+    <ClCompile Include="HighSpeedChartCtrl\ChartPointsSerie.cpp" />
+    <ClCompile Include="HighSpeedChartCtrl\ChartScrollBar.cpp" />
+    <ClCompile Include="HighSpeedChartCtrl\ChartSerie.cpp" />
+    <ClCompile Include="HighSpeedChartCtrl\ChartStandardAxis.cpp" />
+    <ClCompile Include="HighSpeedChartCtrl\ChartSurfaceSerie.cpp" />
+    <ClCompile Include="HighSpeedChartCtrl\ChartTitle.cpp" />
+    <ClCompile Include="HighSpeedChartCtrl\ChartXYSerie.cpp" />
+    <ClCompile Include="HighSpeedChartCtrl\ColourPicker.cpp" />
+    <ClCompile Include="HighSpeedChartCtrl\ColourPopup.cpp" />
+    <ClCompile Include="ProducerConsumer.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="strategy.cpp" />
+    <ClCompile Include="ThreadWorkLogic.cpp" />
+    <ClCompile Include="traderApi.cpp" />
+    <ClCompile Include="traderSpi.cpp" />
+    <ClCompile Include="VolumeIndicatorMD.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="CTP-MFC.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="config.ini" />
+    <None Include="HighSpeedChartCtrl\ChartBalloonLabel.inl" />
+    <None Include="HighSpeedChartCtrl\ChartLabel.inl" />
+    <None Include="HighSpeedChartCtrl\ChartPointsArray.inl" />
+    <None Include="HighSpeedChartCtrl\ChartSerieBase.inl" />
+    <None Include="res\CTPMFC.rc2" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\CTP-MFC.ico" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties RESOURCE_FILE="CTP-MFC.rc" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>
