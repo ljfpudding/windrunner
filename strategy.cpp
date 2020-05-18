@@ -395,8 +395,14 @@ unsigned int __stdcall CalculateStrategyThreadProc(void * data)
 			int j = 0;
 		}
 
+		//g_vcDWK.push_back(dwk);
+		//g_vcDWD.push_back(dwd);
 	}
 
+
+	//theApp.GetMainWnd()->PostMessage(WM_READTESTDATA, 0, 0);
+
+	WaitForSingleObject(CloseSignalReady, INFINITE);
 
 	_endthreadex(0);
 	return 0;

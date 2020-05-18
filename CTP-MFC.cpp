@@ -79,8 +79,7 @@ BOOL CCTPMFCApp::InitInstance()
 	SetRegistryKey(_T("应用程序向导生成的本地应用程序"));
 
 
-	GdiplusStartupInput gdiplusStartupInput;
-	GdiplusStartup(&m_nGdiplusToken, &gdiplusStartupInput, NULL);
+
 
 
 	//LoginSignalReady = CreateEvent(NULL, false, false, NULL);
@@ -124,6 +123,6 @@ BOOL CCTPMFCApp::InitInstance()
 
 int CCTPMFCApp::ExitInstance()
 {
-	GdiplusShutdown(m_nGdiplusToken);
+	
 	return CWinApp::ExitInstance();
 }

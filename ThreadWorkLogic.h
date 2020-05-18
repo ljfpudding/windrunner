@@ -7,6 +7,7 @@
 #include <iostream>
 #include <fstream>
 #include <ctime>
+#include <queue>
 
 #include "readerwriterqueue.h"
 #include "ThostFtdcUserApiStruct.h"
@@ -42,8 +43,10 @@ typedef struct parameterTransToChart
 }PARAMTOCHARTS;
 
 extern void PostMessageToDlg(PARAMTOCHARTS &param);
-extern map<string, map<int, double>> g_mapPrice;
+extern map<string, queue<MDTICKDATA>> g_mapPrice;
 extern vector<string> md_InstrumentID;
+
+extern map<string, queue<MDTICKDATA>>::iterator selitor;
 
 
 enum open_interest_delta_forward_enum
@@ -137,12 +140,8 @@ public:
 
 	void RegisterFensUserInfo();
 
-	/*virtual void OnFrontDisconnected(int nReason)
-	{
-	//LOG("<OnFrontDisconnected>\n");
-	//LOG("\tnReason = %d\n", nReason);
-	//LOG("</OnFrontDisconnected>\n");
-	}*/
+	virtual void OnFrontDisconnected(int nReason);
+
 
 	void ReqUserLogin();
 	virtual void OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,	CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);

@@ -19,7 +19,7 @@ using namespace std;
 
 HANDLE LoginSignalReady = CreateEvent(NULL, false, false, NULL);
 HANDLE SubscribeSignalReady = CreateEvent(NULL, false, false, NULL);
-HANDLE CloseSignalReady = CreateEvent(NULL, false, false, NULL);
+HANDLE CloseSignalReady = CreateEvent(NULL, true, false, NULL);//结束所有线程信号，为手动方式
 HANDLE writeFileNameSignalReady = CreateEvent(NULL, false, false, NULL);
 HANDLE ReceiveDepDataSignalReady = CreateEvent(NULL, false, false, NULL);
 HANDLE writeDepDataSignalReady = CreateEvent(NULL, false, false, NULL);
@@ -134,7 +134,7 @@ int  CVolumeIndicatorMDSpi::SubscribeMarketData()
 			int result = m_pUserMdApi->SubscribeMarketData(ppInstrumentID, a);
 			//LOG((result == 0) ? "订阅行情请求1......发送成功\n" : "订阅行情请求1......发送失败，错误序号=[%d]\n", result);
 		}
-		else if (count1 = md_InstrumentID.size() / 500)
+		else if (count1 == md_InstrumentID.size() / 500)
 		{
 			int count2 = 0;
 			for (count2; count2 < md_InstrumentID.size() % 500; count2++)
@@ -295,18 +295,42 @@ void CVolumeIndicatorMDSpi::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField 
 			PostMessageToDlg(paramTrans);
 		}*/
 
-			memset(&structTickData, 0, sizeof(struct CMDTickdata));
+			memset(&structTickData, 0, sizeof(MDTICKDATA));
 			strcpy_s(structTickData.cInstrumentID, pDepthMarketData->InstrumentID);
+			strcpy_s(structTickData.cExchangeIDType, pDepthMarketData->ExchangeID);
 			strcpy_s(structTickData.cUpdatetime, pDepthMarketData->UpdateTime);
 			structTickData.iMilitime = pDepthMarketData->UpdateMillisec;
 			structTickData.dwLastPrice = pDepthMarketData->LastPrice;
 			structTickData.iVolume = pDepthMarketData->Volume;
 			structTickData.dwOpenInterest = pDepthMarketData->OpenInterest;
+			
 			structTickData.dwBidPrice1 = pDepthMarketData->BidPrice1;
 			structTickData.iBidVolume1 = pDepthMarketData->BidVolume1;
 			structTickData.dwAskPrice1 = pDepthMarketData->AskPrice1;
 			structTickData.iAskVolume1 = pDepthMarketData->AskVolume1;
-			structTickData.nIndex = m_nIndex++;
+
+
+			structTickData.dwBidPrice2 = pDepthMarketData->BidPrice2;
+			structTickData.iBidVolume2 = pDepthMarketData->BidVolume2;
+			structTickData.dwAskPrice2 = pDepthMarketData->AskPrice2;
+			structTickData.iAskVolume2 = pDepthMarketData->AskVolume2;
+
+			structTickData.dwBidPrice3 = pDepthMarketData->BidPrice3;
+			structTickData.iBidVolume3 = pDepthMarketData->BidVolume3;
+			structTickData.dwAskPrice3 = pDepthMarketData->AskPrice3;
+			structTickData.iAskVolume3 = pDepthMarketData->AskVolume3;
+
+			structTickData.dwBidPrice4 = pDepthMarketData->BidPrice4;
+			structTickData.iBidVolume4 = pDepthMarketData->BidVolume4;
+			structTickData.dwAskPrice4 = pDepthMarketData->AskPrice4;
+			structTickData.iAskVolume4 = pDepthMarketData->AskVolume4;
+
+			structTickData.dwBidPrice5 = pDepthMarketData->BidPrice5;
+			structTickData.iBidVolume5 = pDepthMarketData->BidVolume5;
+			structTickData.dwAskPrice5 = pDepthMarketData->AskPrice5;
+			structTickData.iAskVolume5 = pDepthMarketData->AskVolume5;
+
+			//structTickData.nIndex = m_nIndex++;
 			tickDataQueue.enqueue(structTickData);
 		//memcpy(&m_preTickData, &structTickData, sizeof(MDTICKDATA));
 

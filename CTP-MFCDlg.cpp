@@ -7,16 +7,17 @@
 #include "afxdialogex.h"
 #include "VolumeIndicatorMD.h"
 #include "ThreadWorkLogic.h"
-#include "ChartCtrlLib\Util.h"
+
 #include  "gdiplusenums.h"
 #include   "wingdi.h"
 #include "strategy.h"
 
-
-
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
+
+vector<double> g_vcDWK; //test draw Line
+vector<double> g_vcDWD; //test draw Line
 
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
 class CAboutDlg : public CDialogEx
@@ -64,6 +65,8 @@ void CCTPMFCDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_LISTBOX_MESSAGE, m_lstMessage);
 	DDX_Control(pDX, IDC_CHARTCTRL, m_ChartCtrl);
 	DDX_Control(pDX, IDC_COMBO_MD, m_ComBoxCtrl);
+	DDX_Control(pDX, IDC_COMBO_SERVER, m_ServerComBoxCtrl);
+	DDX_Control(pDX, IDC_COMBO_TIMEINTERVAL, m_TimeIntervalComBoxCtrl);
 	
 	 
 }
@@ -78,8 +81,68 @@ BEGIN_MESSAGE_MAP(CCTPMFCDlg, CDialogEx)
 	ON_MESSAGE(WM_MYMSG, &CCTPMFCDlg::OnMyMsgHandler)
 	ON_MESSAGE(WM_KDJMSG,&CCTPMFCDlg::OnKDJMsgHandler)
 	ON_MESSAGE(WM_HEYUEPREPARED, &CCTPMFCDlg::OnHeYuePreparedHandler)
-	ON_NOTIFY(CODE_VISIBILITY, IDC_CHARTCTRL, OnChartVisibilityChanged)
+	ON_MESSAGE(WM_READTESTDATA, &CCTPMFCDlg::OnReadTestDataHandler)
+	ON_CBN_SELCHANGE(IDC_COMBO_MD, &CCTPMFCDlg::OnSelComChange)
+	ON_CBN_SELCHANGE(IDC_COMBO_SERVER, &CCTPMFCDlg::OnSelComChangeServer)
+	ON_CBN_SELCHANGE(IDC_COMBO_TIMEINTERVAL, &CCTPMFCDlg::OnSelComChangeTimeInterval)
+	
 END_MESSAGE_MAP()
+
+
+void CCTPMFCDlg::OnSelComChangeServer()
+{
+
+
+
+}
+
+void CCTPMFCDlg::OnSelComChangeTimeInterval()
+{
+
+
+
+
+}
+
+
+
+static int x = 0;
+void CCTPMFCDlg::OnSelComChange()
+{
+	int nPos = m_ComBoxCtrl.GetCurSel();	
+	m_ComBoxCtrl.GetLBText(nPos, m_strSelInstrument);
+
+	string str = CW2A( m_strSelInstrument.GetString());
+	selitor = g_mapPrice.find(str);
+
+	std::lock_guard<spin_mutex> lock(sm);
+	if (selitor != g_mapPrice.end())
+	{
+		if (m_pLineSerie != NULL)
+		{
+			m_ChartCtrl.RemoveSerie(m_pLineSerie->GetSerieId());
+			m_pLineSerie = m_ChartCtrl.CreateLineSerie();
+			x = 0;
+		}
+
+		MDTICKDATA data;
+		if (selitor->second.size() != 0)
+		{
+			data = selitor->second.front();
+			m_pLeftAxis->SetMinMax(data.dwLastPrice - 3, data.dwLastPrice + 3);
+		}
+
+		m_bSel = TRUE;
+	}
+}
+
+LRESULT CCTPMFCDlg::OnReadTestDataHandler(WPARAM w, LPARAM l)
+{
+
+
+
+	return 0;
+}
 
 LRESULT CCTPMFCDlg::OnHeYuePreparedHandler(WPARAM w, LPARAM l)
 {
@@ -96,11 +159,27 @@ LRESULT CCTPMFCDlg::OnHeYuePreparedHandler(WPARAM w, LPARAM l)
 	return 0;
 }
 
-
-
 void CCTPMFCDlg::OnTimer(UINT_PTR nIDEvent)
 {
+	if (nIDEvent == 2)
+	{
+		if (g_mapPrice.size() != 0 && m_bSel)
+		{
+			std::lock_guard<spin_mutex> lock(sm);
+			if (selitor != g_mapPrice.end())
+			{
+				MDTICKDATA data;
+				if (selitor->second.size() != 0)
+				{
 
+					//data = selitor->second.front();
+					///selitor->second.pop();
+					//m_pLineSerie->AddPoint(x++, data.dwLastPrice);
+
+				}
+			}
+		}
+	}
 
 	CDialogEx::OnTimer(nIDEvent);
 }
@@ -177,6 +256,8 @@ BOOL CCTPMFCDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 	ShowWindow(SW_NORMAL);
 
+	m_bSel = FALSE;
+
 
 	EnableToolTips(TRUE);
 	m_tt.Create(this);
@@ -193,31 +274,15 @@ BOOL CCTPMFCDlg::OnInitDialog()
 
 	m_lstMessage.SetHorizontalExtent(10000);
 
-	CChartStandardAxis* pBottomAxis =
-		m_ChartCtrl.CreateStandardAxis(CChartCtrl::BottomAxis);
-	pBottomAxis->SetMinMax(0, 500);
-	CChartStandardAxis* pLeftAxis =
-		m_ChartCtrl.CreateStandardAxis(CChartCtrl::LeftAxis);
-	pLeftAxis->SetMinMax(0, 500);
+	m_pBottomAxis =  m_ChartCtrl.CreateStandardAxis(CChartCtrl::BottomAxis);
+	m_pBottomAxis->SetMinMax(0, 200);
 
-	pCandleSerie = m_ChartCtrl.CreateCandlestickSerie(false, false);
-
-
-	//void AddPoint(double XVal, double Low, double High, double Open, double Close);
-
-	pCandleSerie->AddPoint(1, 10, 20, 18, 16);
-	pCandleSerie->AddPoint(2, 12, 26, 18, 22);
-	pCandleSerie->AddPoint(3, 8, 19, 15, 18);
-	pCandleSerie->AddPoint(4, 12, 20, 12, 20);
-	pCandleSerie->AddPoint(5, 6, 15, 15, 6);
-	pCandleSerie->AddPoint(6, 9, 21, 14, 20);
-
+	m_pLeftAxis =  m_ChartCtrl.CreateStandardAxis(CChartCtrl::LeftAxis);
+	m_pLineSerie = m_ChartCtrl.CreateLineSerie();
+	m_pLineSerie->SetSmooth(true);
 
 	SetTimer(1, 5000, NULL);
-
-
-
-
+	SetTimer(2, 1, NULL);
 
 	// TODO: 在此添加额外的初始化代码
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
@@ -307,6 +372,6 @@ void CCTPMFCDlg::OnBnClickedBtnMdClose()
 
 void CCTPMFCDlg::OnChartVisibilityChanged(NMHDR* nmhdr, LRESULT* pRes)
 {
-	NMCHART* pNmChart = PNMCHART(nmhdr);
+	//NMCHART* pNmChart = PNMCHART(nmhdr);
 
 }

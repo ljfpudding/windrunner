@@ -43,6 +43,7 @@ struct CMDPankoudata
 typedef struct CMDTickdata
 {
 	char	cInstrumentID[31];
+	char	cExchangeIDType[9];//交易所代码 SHFE上交所，默认可以有五档行情，DCE等其他交易所需要交费才有五档行情
 	char	cUpdatetime[9];
 	int		iMilitime;
 	double	dwLastPrice;
@@ -55,6 +56,27 @@ typedef struct CMDTickdata
 	int		iOpenDelta;
 	char	cInformation[50];
 	int		nIndex;//Price索引，为了计算各个指标方便。
+
+	double	dwBidPrice2;
+	int		iBidVolume2;
+	double	dwAskPrice2;
+	int		iAskVolume2;
+
+	double	dwBidPrice3;
+	int		iBidVolume3;
+	double	dwAskPrice3;
+	int		iAskVolume3;
+
+	double	dwBidPrice4;
+	int		iBidVolume4;
+	double	dwAskPrice4;
+	int		iAskVolume4;
+
+	double	dwBidPrice5;
+	int		iBidVolume5;
+	double	dwAskPrice5;
+	int		iAskVolume5;
+
 }MDTICKDATA;
 
 using namespace std;
@@ -150,7 +172,7 @@ class CVolumeIndicatorMDApi : public CThostFtdcMdApi
 {
    
 public:
-	CVolumeIndicatorMDApi() {}
+	CVolumeIndicatorMDApi() { m_pApi = NULL; }
 	~CVolumeIndicatorMDApi() {}
 
 private:

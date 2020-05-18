@@ -5,19 +5,20 @@
 #pragma once
 
 
+
 #define WM_MYMSG   WM_USER+88
 #define WM_KDJMSG  WM_USER+89
 #define WM_HEYUEPREPARED	WM_USER+90 //合约就绪
+#define WM_READTESTDATA     WM_USER+91//读取Test Data
 
-#include "ChartCtrlLib/ChartDef.h"
-#include "ChartCtrlLib/ChartContainer.h"
+
 
 #include "HighSpeedChartCtrl/ChartCtrl.h"
 #include "HighSpeedChartCtrl/ColourPicker.h"
 #include "HighSpeedChartCtrl/ChartLineSerie.h"
 #include "HighSpeedChartCtrl/ChartCandlestickSerie.h"
 
-
+using namespace std;
 
 typedef struct
 {
@@ -64,23 +65,34 @@ public:
 	afx_msg LRESULT OnMyMsgHandler(WPARAM, LPARAM);
 	afx_msg LRESULT OnKDJMsgHandler(WPARAM, LPARAM);
 	afx_msg LRESULT OnHeYuePreparedHandler(WPARAM, LPARAM);
+	afx_msg LRESULT OnReadTestDataHandler(WPARAM, LPARAM);
 	afx_msg void OnChartVisibilityChanged(NMHDR*, LRESULT*);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
-
-	
-
+	afx_msg void OnSelComChange();
+	afx_msg void OnSelComChangeServer();
+	afx_msg void OnSelComChangeTimeInterval();
 
 public:
 	void DrawInit();
 
 
 public:
+	CString m_strSelInstrument;
+	BOOL	m_bSel;
+
+public:
 	CListBox m_lstMessage;
 	CComboBox  m_ComBoxCtrl;
 	CToolTipCtrl m_tt;
+	CComboBox  m_ServerComBoxCtrl;
+	CComboBox  m_TimeIntervalComBoxCtrl;
 
 protected:
 	CChartCtrl m_ChartCtrl;
 	CChartCandlestickSerie *pCandleSerie;
+	CChartLineSerie	*m_pLineSerie;
+	CChartStandardAxis* m_pBottomAxis;
+	CChartStandardAxis* m_pLeftAxis;
+
 
 };

@@ -7,6 +7,8 @@
 
 
 
+using namespace moodycamel;
+
 CVolumeIndicatorMDApi  *pUserMdApi = NULL;
 HANDLE hFetchMD = NULL; //获取行情Handle;
 HANDLE hWriteData = NULL;//写data到文件;
@@ -34,7 +36,10 @@ vector<string> md_InstrumentID;
 map<string, string> gmap_FilepathInstrument;
 spin_mutex sm;
 
-map<string, map<int, double>> g_mapPrice;
+
+map<string, queue<MDTICKDATA>> g_mapPrice;
+map<string, queue<MDTICKDATA>>::iterator selitor;
+
 int nRequestID = 0;
 
 
@@ -50,7 +55,6 @@ void PostMessageToDlg(PARAMTOCHARTS &param)
 		paramTrans->strMessage = param.strMessage;
 		paramTrans->nIndex = param.nIndex;
 	}
-	//memcpy(paramTrans, &param, sizeof(PARAMTOCHARTS));
 	
 	theApp.GetMainWnd()->PostMessageW(WM_MYMSG, (WPARAM)paramTrans, 0);
 
@@ -216,7 +220,8 @@ void fireOnEightFiftyeightThirtySeconds(CVolumeIndicatorMDSpi *pSpi = NULL)
 {
 	time_t currtime;
 	struct tm *mt = NULL;
-	while(true)
+	//while(true)
+	while (WaitForSingleObject(CloseSignalReady, 0) != WAIT_OBJECT_0)//设置CloseSignalReady信号，线程退出
 	{   
 		Sleep(1000);
 		time(&currtime);
@@ -259,7 +264,24 @@ unsigned int __stdcall fetchMDThreadProc(void * data)
 	
 	string g_chFrontMdaddr = getConfig("config", "FrontMdAddr");
 	pUserMdApi = new CVolumeIndicatorMDApi;		
-	pUserMdApi->CreateFtdcMdApi(".\\liu\\");
+	pUserMdApi->CreateFtdcMdApi(".\\liu\\",true,true);
+
+	if (pUserMdApi == NULL)
+	{
+		string str = "Create UDP MD API Failed!";
+		PARAMTOCHARTS paramTrans;
+		memset(&paramTrans, 0, sizeof(PARAMTOCHARTS));
+		paramTrans.strMessage = str;
+		PostMessageToDlg(paramTrans);
+	}
+	else
+	{
+		string str = "Create UDP MD API Successful!";
+		PARAMTOCHARTS paramTrans;
+		memset(&paramTrans, 0, sizeof(PARAMTOCHARTS));
+		paramTrans.strMessage = str;
+		PostMessageToDlg(paramTrans);
+	}
 
 	CVolumeIndicatorMDSpi ash(pUserMdApi);
 	pUserMdApi->RegisterSpi(&ash);
@@ -393,9 +415,10 @@ void writePankouDatatoCSVFile()
 void writeTickDataCSVFile()
 {
 
-	while (true)
+	//while (true)
+	while (WaitForSingleObject(CloseSignalReady, 0) != WAIT_OBJECT_0)//设置CloseSignalReady信号，线程退出
 	{
-		Sleep(210);
+		//Sleep(210);
 		map<string, string>::iterator itor;
 		struct CMDTickdata structTickData;
 		while (tickWriteDataQueue.try_dequeue(structTickData))
@@ -648,9 +671,6 @@ unsigned int __stdcall writeDataThreadProc(void * data)
 	WaitForSingleObject(writeFileNameSignalReady, INFINITE);
 	writeCSVfile();
 
-	//WaitForSingleObject(writeDepDataSignalReady, INFINITE);
-	//writePankouDatatoCSVFile();
-
 	writeTickDataCSVFile();
 
 	/*
@@ -875,21 +895,19 @@ unsigned int __stdcall CalculateAndAnalysisThreadProc(void * data)
 	//preStructTickData = 早上开盘读取昨天收盘的最后一条数据; 中间休息时，读取上一次的最后一条数据
 
 	WaitForSingleObject(ReceiveDepDataSignalReady, INFINITE);
-	
-	while (true)
-	{
-		Sleep(50);
+		
+	while (WaitForSingleObject(CloseSignalReady, 0)!= WAIT_OBJECT_0)//设置CloseSignalReady信号，线程退出
+	{		
 		MDTICKDATA	structTickData;
 		while (tickDataQueue.try_dequeue(structTickData))
 		{
-			    //<< structTickData.cUpdatetime << ","     //最后修改时间
+			//<< structTickData.cUpdatetime << ","     //最后修改时间
 				//<< structTickData.iMilitime << ","  //毫秒
 				//<<  << ","   //最新价
 				//<< structTickData.iVolume << ","  //数量
 				//<< structTickData.dwOpenInterest << ","  //持仓量				
 				//<< structTickData.iBidVolume1 << ","   //买一量				
 				//<< structTickData.iAskVolume1       //卖一量
-
 			
 			/*
 			甲方是主动方，乙方和丙方是对手方
@@ -899,33 +917,33 @@ unsigned int __stdcall CalculateAndAnalysisThreadProc(void * data)
 			空平：甲方空头平仓，卖出10手空单，对手方，乙方卖出2手多单，丙方买入8手空单，双边持仓减少4手
 			*/
 			//计算每一TICK的累计多单持仓数量与空单持仓数量
-		/*	int nLongVolumeNum = 0;
+			/*	int nLongVolumeNum = 0;
 			int nShortVolumeNum = 0;
 			order_forward_enum tickorder = get_order_forward(structTickData.dwLastPrice, structTickData.dwAskPrice1, structTickData.dwBidPrice1, preStructTickData.dwLastPrice, preStructTickData.dwAskPrice1, preStructTickData.dwBidPrice1);
-			 			 int volume_delta = structTickData.iVolume - preStructTickData.iVolume;
+						 int volume_delta = structTickData.iVolume - preStructTickData.iVolume;
 			 int open_interest_delta = int(structTickData.dwOpenInterest - preStructTickData.dwOpenInterest);
-			 			 open_interest_delta_forward_enum local_open_interest_delta_forward;
+						 open_interest_delta_forward_enum local_open_interest_delta_forward;
 			 if (open_interest_delta == 0 && volume_delta == 0)
 				 local_open_interest_delta_forward = open_interest_delta_forward_enum::NONE;
 			 else if (open_interest_delta == 0 && volume_delta > 0)
 				 local_open_interest_delta_forward = open_interest_delta_forward_enum::EXCHANGE;
 			 else if (open_interest_delta > 0)
-			 {				
+			 {
 				 if (volume_delta - open_interest_delta == 0)
 				 {
 					 local_open_interest_delta_forward = open_interest_delta_forward_enum::OPENFWDOUBLE;
 					 nLongVolumeNum += volume_delta;
 					 nShortVolumeNum += volume_delta;
-				 }					 
+				 }
 				 else
 				 {
 					 local_open_interest_delta_forward = open_interest_delta_forward_enum::OPEN;
-					 if (tickorder == order_forward_enum::UP) //多开=空开+多平, 持仓量增加; 
+					 if (tickorder == order_forward_enum::UP) //多开=空开+多平, 持仓量增加;
 					 {
 						 nLongVolumeNum += volume_delta;
 						 nShortVolumeNum += open_interest_delta;
 					 }
-					 else if (tickorder == order_forward_enum::DOWN) //空开= 多开+空平, 持仓量增加; 
+					 else if (tickorder == order_forward_enum::DOWN) //空开= 多开+空平, 持仓量增加;
 					 {
 						 nShortVolumeNum += volume_delta;
 						 nLongVolumeNum += open_interest_delta;
@@ -935,7 +953,7 @@ unsigned int __stdcall CalculateAndAnalysisThreadProc(void * data)
 
 					 }
 				 }
-					 
+
 			 }
 			 else if (open_interest_delta < 0)
 			 {
@@ -962,7 +980,7 @@ unsigned int __stdcall CalculateAndAnalysisThreadProc(void * data)
 					 {
 
 					 }
-				 }					 
+				 }
 			 }
 
 			 if (preStructTickData.iVolume != 0)
@@ -972,14 +990,25 @@ unsigned int __stdcall CalculateAndAnalysisThreadProc(void * data)
 				 paramTrans.dwprice = structTickData.dwLastPrice;
 				 paramTrans.nGap = nLongVolumeNum - nShortVolumeNum;
 				 paramTrans.nIndex = structTickData.nIndex;
-				 PostMessageToDlg(paramTrans);				 
+				 PostMessageToDlg(paramTrans);
 			 }
 			 memcpy(&preStructTickData, &structTickData, sizeof(MDTICKDATA)); */
-			 tickWriteDataQueue.enqueue(structTickData);
+			tickWriteDataQueue.enqueue(structTickData);
 
-			 //std::lock_guard<spin_mutex> lock(sm);
-			 //g_mapPrice.insert(map<int, double>::value_type(structTickData.nIndex, structTickData.dwLastPrice));	
-		}		
+			std::lock_guard<spin_mutex> lock(sm);			
+			map<string, queue<MDTICKDATA>>::iterator itor;
+			itor = g_mapPrice.find(string(structTickData.cInstrumentID));
+			if (itor != g_mapPrice.end())
+			{
+				itor->second.push(structTickData);
+			}
+			else
+			{
+				queue<MDTICKDATA> vcTickDataQueue;
+				vcTickDataQueue.push(structTickData);
+				g_mapPrice.insert(map<string, queue<MDTICKDATA>>::value_type(structTickData.cInstrumentID, vcTickDataQueue));
+			}
+		}
 	}
 	_endthreadex(0);
 	return 0;
@@ -998,23 +1027,20 @@ CSimpleHandler::CSimpleHandler(CThostFtdcTraderApi *pUserApi) :m_pUserApi(pUserA
 
 void CSimpleHandler::OnFrontConnected()
 {
-	strcpy_s(g_chBrokerID, getConfig("config", "BrokerID").c_str());
-	strcpy_s(g_chUserID, getConfig("config", "UserID").c_str());
-	strcpy_s(g_chPassword, getConfig("config", "Password").c_str());
-	strcpy_s(g_chInvestorID, getConfig("config", "InvestorID").c_str());
-	strcpy_s(g_chAuthCode, getConfig("config", "AuthCode").c_str());
-	strcpy_s(g_chAppID, getConfig("config", "AppID").c_str());
-	g_NewFrontID = 0;
-	g_NewSessionID = 0;
-	//ReqUserLogin();
-	//ReqAuthenticate();
 	SetEvent(hTraderConnectSignalReady);
+
+}
+
+void CSimpleHandler::OnFrontDisconnected(int nReason)
+{
+	//LOG("\tnReason = %d\n", nReason);
+	SetEvent(CloseSignalReady);
 }
 
 void CSimpleHandler::ReqAuthenticate()
 {
 	{
-		//strcpy_s(g_chUserProductInfo, getConfig("config", "UserProductInfo").c_str());
+		
 		strcpy_s(g_chAuthCode, getConfig("config", "AuthCode").c_str());
 		strcpy_s(g_chAppID, getConfig("config", "AppID").c_str());
 		strcpy_s(g_chBrokerID, getConfig("config", "BrokerID").c_str());
@@ -1029,11 +1055,10 @@ void CSimpleHandler::ReqAuthenticate()
 		CThostFtdcReqAuthenticateField a = { 0 };
 		strcpy_s(a.BrokerID, g_chBrokerID);
 		strcpy_s(a.UserID, g_chUserID);
-		//strcpy_s(a.UserProductInfo, "");
 		strcpy_s(a.AuthCode, g_chAuthCode);
 		strcpy_s(a.AppID, g_chAppID);
 		int b = m_pUserApi->ReqAuthenticate(&a, 1);
-		printf("\t客户端认证 = [%d]\n", b);
+		
 	}
 
 }
@@ -1057,19 +1082,10 @@ void CSimpleHandler::RegisterFensUserInfo()
 void CSimpleHandler::ReqUserLogin()
 {
 
-	strcpy_s(g_chAuthCode, getConfig("config", "AuthCode").c_str());
-	strcpy_s(g_chAppID, getConfig("config", "AppID").c_str());
-	strcpy_s(g_chBrokerID, getConfig("config", "BrokerID").c_str());
-	strcpy_s(g_chUserID, getConfig("config", "UserID").c_str());
-	strcpy_s(g_chPassword, getConfig("config", "Password").c_str());
-	strcpy_s(g_chInvestorID, getConfig("config", "InvestorID").c_str());
-
 	CThostFtdcReqUserLoginField reqUserLogin = { 0 };
 	strcpy_s(reqUserLogin.BrokerID, g_chBrokerID);
 	strcpy_s(reqUserLogin.UserID, g_chUserID);
 	strcpy_s(reqUserLogin.Password, g_chPassword);
-	//strcpy_s(reqUserLogin.ClientIPAddress, "::c0a8:0101");
-	//strcpy_s(reqUserLogin.UserProductInfo, "123");
 	// 发出登陆请求
 	m_pUserApi->ReqUserLogin(&reqUserLogin, nRequestID++);
 }
@@ -1080,11 +1096,8 @@ void CSimpleHandler::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,	
 	//SessionID = pRspUserLogin->SessionID;
 	CTraderSpi::OnRspUserLogin(pRspUserLogin, pRspInfo, nRequestID, bIsLast);
 	if (pRspInfo->ErrorID != 0)
-		//if (pRspInfo)
 	{
-		/*LOG("\tFailed to login, errorcode=[%d]\n \terrormsg=[%s]\n \trequestid = [%d]\n \tchain = [%d]\n",
-			pRspInfo->ErrorID, pRspInfo->ErrorMsg, nRequestID, bIsLast);*/
-		//exit(-1);
+		SetEvent(CloseSignalReady);
 	}
 	SetEvent(hTraderLoginSignalReady);
 }
@@ -1105,8 +1118,29 @@ void CSimpleHandler::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument, 
 {
 	if (pInstrument)
 	{
-		if(string(pInstrument->ExchangeID) != string("CFFEX"))
-			md_InstrumentID.push_back(pInstrument->InstrumentID);
+		if (string(pInstrument->ExchangeID) != string("CFFEX"))//没有加入中金所合约，股指期货要求50万入门，所以也先不查询
+		{
+
+			string strInstruct = string(pInstrument->InstrumentID);
+			int nInstrumentLength = strInstruct.length();
+			if (nInstrumentLength < 10)
+			{
+				string strPre = strInstruct.substr(0, 3); //前3个字符串为SPC,SPD,STD,STG， 应该为组合合约，忽略不查询
+				string strPre2 = strInstruct.substr(0, 2);
+				
+				
+				if (!(strPre == "SPC" || strPre == "SPD" || strPre == "STD" || strPre == "STG"
+					|| strPre == "PRT" || strPre == "IPS"
+					|| strPre2 == "SP"))
+
+				//string strTestrb2008 = strInstruct.substr(0, 6);
+				//if(strTestrb2008 == "fu2009")
+					md_InstrumentID.push_back(pInstrument->InstrumentID);
+
+
+
+			}
+		}			
 	}
 
 	if (bIsLast)
@@ -1160,7 +1194,7 @@ void CSimpleHandler::ReqSettlementInfoConfirm()
 void CSimpleHandler::OnRspSettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField *pSettlementInfoConfirm,	CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	CTraderSpi::OnRspSettlementInfoConfirm(pSettlementInfoConfirm, pRspInfo, nRequestID, bIsLast);
-	//SetEvent(g_hEvent);
+	
 }
 
 ///用户口令更新请求
@@ -1175,7 +1209,7 @@ void CSimpleHandler::ReqUserPasswordUpdate()
 	strcpy_s(a.OldPassword, g_chPassword);
 	strcpy_s(a.NewPassword, newpassword.c_str());
 	int b = m_pUserApi->ReqUserPasswordUpdate(&a, nRequestID++);
-	//LOG((b == 0) ? "用户口令更新请求......发送成功\n" : "用户口令更新请求......发送失败，序号=[%d]\n", b);
+	
 }
 
 
@@ -1183,7 +1217,7 @@ void CSimpleHandler::ReqUserPasswordUpdate()
 void CSimpleHandler::OnRspUserPasswordUpdate(CThostFtdcUserPasswordUpdateField *pUserPasswordUpdate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	CTraderSpi::OnRspUserPasswordUpdate(pUserPasswordUpdate, pRspInfo, nRequestID, bIsLast);
-	//SetEvent(g_hEvent);
+	
 }
 
 
@@ -1200,14 +1234,14 @@ void CSimpleHandler::ReqTradingAccountPasswordUpdate()
 	strcpy_s(a.NewPassword, newpassword.c_str());
 	strcpy_s(a.CurrencyID, "CNY");
 	int b = m_pUserApi->ReqTradingAccountPasswordUpdate(&a, nRequestID++);
-	//LOG((b == 0) ? "资金账户口令更新请求......发送成功\n" : "资金账户口令更新请求......发送失败，序号=[%d]\n", b);
+	
 }
 
 
 void CSimpleHandler::OnRspTradingAccountPasswordUpdate(CThostFtdcTradingAccountPasswordUpdateField *pTradingAccountPasswordUpdate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	CTraderSpi::OnRspTradingAccountPasswordUpdate(pTradingAccountPasswordUpdate, pRspInfo, nRequestID, bIsLast);
-	//SetEvent(g_hEvent);
+	
 }
 
 
