@@ -362,12 +362,19 @@ void CCTPMFCDlg::OnBnClickedBtnMdClose()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	SetEvent(CloseSignalReady);	
+	Sleep(2000);
+
 	CloseHandle(hFetchMD);
 	CloseHandle(hWriteData);
 	CloseHandle(hWaitForConDisconnect);
 	CloseHandle(hCalAnalysis);
 	CloseHandle(hStrategy);
 	CloseHandle(hTradeThreadProc);
+
+	m_ComBoxCtrl.ResetContent();
+	m_ComBoxCtrl.Clear();
+	ResetEvent(CloseSignalReady);
+
 }
 
 void CCTPMFCDlg::OnChartVisibilityChanged(NMHDR* nmhdr, LRESULT* pRes)

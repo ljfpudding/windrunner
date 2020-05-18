@@ -2,51 +2,14 @@
 #include "ThreadWorkLogic.h"
 #include "CTP-MFC.h"
 #include "CTP-MFCDlg.h"
-
 #include "traderapi.h"
 
 
-
-using namespace moodycamel;
-
 CVolumeIndicatorMDApi  *pUserMdApi = NULL;
-HANDLE hFetchMD = NULL; //获取行情Handle;
-HANDLE hWriteData = NULL;//写data到文件;
-HANDLE hWaitForConDisconnect = NULL;
-HANDLE hCalAnalysis = NULL;
-
-HANDLE  hTradeThreadProc = NULL;//交易Thread
-
-int nConDisconnect = 0; //是否ConDisconnect
-
-HANDLE hTraderAuthSignalReady = CreateEvent(NULL, false, false, NULL);//Trader Auth Ready
-HANDLE hTraderLoginSignalReady = CreateEvent(NULL, false, false, NULL);//Trader Login Ready
-HANDLE hTraderConnectSignalReady = CreateEvent(NULL, false, false, NULL);//Trader Connect Ready
-HANDLE hMDThreadToStartSignalReady = CreateEvent(NULL, false, false, NULL);//Trader Connect Ready
-
-
-CThostFtdcDepthMarketDataField m_preDepthMarketData;
-TICK_TYPE_DICT m_tick_type_dict;
-HANDICAP_DICT m_handicap_dict;
-TICK_TYPE_STR_DICT m_tick_type_str_dict;
-TICK_TYPE_STR_DICT m_color_type_str_dict;
-
-ReaderWriterQueue<MDTICKDATA> tickWriteDataQueue;
-vector<string> md_InstrumentID;
-map<string, string> gmap_FilepathInstrument;
-spin_mutex sm;
-
-
-map<string, queue<MDTICKDATA>> g_mapPrice;
-map<string, queue<MDTICKDATA>>::iterator selitor;
-
 int nRequestID = 0;
-
 
 void PostMessageToDlg(PARAMTOCHARTS &param)
 {
-
-
 	PARAMTOCHARTS *paramTrans = new PARAMTOCHARTS;
 	memset(paramTrans, 0, sizeof(PARAMTOCHARTS));
 	{
@@ -57,8 +20,6 @@ void PostMessageToDlg(PARAMTOCHARTS &param)
 	}
 	
 	theApp.GetMainWnd()->PostMessageW(WM_MYMSG, (WPARAM)paramTrans, 0);
-
-
 }
 
 void LoginActionPostMessage(int LoginType, int LoginCount, CVolumeIndicatorMDSpi *pSpi=NULL)
@@ -261,7 +222,6 @@ void fireOnEightFiftyeightThirtySeconds(CVolumeIndicatorMDSpi *pSpi = NULL)
 unsigned int __stdcall fetchMDThreadProc(void * data)
 {	
 	
-	
 	string g_chFrontMdaddr = getConfig("config", "FrontMdAddr");
 	pUserMdApi = new CVolumeIndicatorMDApi;		
 	pUserMdApi->CreateFtdcMdApi(".\\liu\\",true,true);
@@ -301,8 +261,14 @@ unsigned int __stdcall fetchMDThreadProc(void * data)
 
 	fireOnEightFiftyeightThirtySeconds(&ash);
 
-	WaitForSingleObject(CloseSignalReady, INFINITE);
+	//WaitForSingleObject(CloseSignalReady, INFINITE);
 	pUserMdApi->Release();
+
+	PARAMTOCHARTS paramTrans;
+	memset(&paramTrans, 0, sizeof(PARAMTOCHARTS));
+	paramTrans.strMessage = "fetchMDThreadProc Thread terminate!";
+	PostMessageToDlg(paramTrans);
+
 	_endthreadex(0);
 
 	return 0;
@@ -311,12 +277,10 @@ unsigned int __stdcall fetchMDThreadProc(void * data)
 
 void writeCSVfile()
 {
-	
 	string strpath = string(targetpath);
 	BOOL isPath = false;
-
 	
-	WaitForSingleObject(MkdirSignalReady, INFINITE);
+	//WaitForSingleObject(SubscribeSignalReady, INFINITE);
 	
 	if (strpath=="")
 		isPath = false;
@@ -331,60 +295,102 @@ void writeCSVfile()
 		time_t currtime = time(NULL);
 		struct tm *mt = localtime(&currtime);
 
+		if (g_vcInstrumentIDFilterStr[i].empty())
+			continue;
+
 		if(isPath)
-			sprintf(m_chMdcsvFileName, "%s\%s_market_data%d%02d%02d%02d%02d.csv",strpath.c_str(), g_vcInstrumentIDFilterStr[i].c_str(), mt->tm_year + 1900, mt->tm_mon + 1, mt->tm_mday, mt->tm_hour, mt->tm_min);
+			sprintf(m_chMdcsvFileName, "%s\%s_%d%02d%02d.csv",strpath.c_str(), g_vcInstrumentIDFilterStr[i].c_str(), mt->tm_year + 1900, mt->tm_mon + 1, mt->tm_mday);
 		else
-			sprintf(m_chMdcsvFileName, "%s_market_data%d%02d%02d%02d%02d.csv", g_vcInstrumentIDFilterStr[i].c_str(), mt->tm_year + 1900, mt->tm_mon + 1, mt->tm_mday, mt->tm_hour, mt->tm_min);
+			sprintf(m_chMdcsvFileName, "%s_%d%02d%02d.csv", g_vcInstrumentIDFilterStr[i].c_str(), mt->tm_year + 1900, mt->tm_mon + 1, mt->tm_mday);
 		
 
+
 		std::ofstream outFile;
-		outFile.open(m_chMdcsvFileName, std::ios::out); // 新开文件
-		outFile
-			<< "合约代码" << ","
-			//<<"交易日"<<","
-			//<< "上次结算价" << ","
-			//<< "昨持仓量" << ","
-			//<< "涨停板价" << ","
-			//<< "跌停板价" << ","
-			//<< "今开盘" << ","
-			//<< "最高价" << ","
-			//<< "最低价" << ","
-			<< "最后修改时间" << ","
-			<< "最后修改毫秒" << ","
-			<< "最新价" << ","
-			<< "数量" << ","
-			//<< "成交金额" << ","
-			<< "持仓量" << ","
-			//<< "今收盘" << ","
-			//<< "本次结算价" << ","
-			<< "申买价一" << ","
-			<< "申买量一" << ","
-			<< "申卖价一" << ","
-			<< "申卖量一" //<< ","
-					  //<< "现手" << ","
-					  //<< "增仓" << ","
-					  //<< "方向"
-			<< std::endl;
+		outFile.open(m_chMdcsvFileName, std::ios::_Noreplace); // 新开文件
 
+		map<string, string>::iterator itor;
+		itor = g_mapSHFEInstrument.find(g_vcInstrumentIDFilterStr[i]);
+		if (itor != g_mapSHFEInstrument.end())//SHFE 上海合约 5档行情
+		{
+			outFile
+				<< "合约代码" << ","
+				//<<"交易日"<<","
+				//<< "上次结算价" << ","
+				//<< "昨持仓量" << ","
+				//<< "涨停板价" << ","
+				//<< "跌停板价" << ","
+				//<< "今开盘" << ","
+				//<< "最高价" << ","
+				//<< "最低价" << ","
+				<< "最后修改时间" << ","
+				<< "最后修改毫秒" << ","
+				<< "最新价" << ","
+				<< "数量" << ","
+				//<< "成交金额" << ","
+				<< "持仓量" << ","
+				//<< "今收盘" << ","
+				//<< "本次结算价" << ","
+				<< "申买价一" << ","
+				<< "申买量一" << ","
+				<< "申卖价一" << ","
+				<< "申卖量一" << ","
+						  //<< "现手" << ","
+						  //<< "增仓" << ","
+						  //<< "方向"
+				<< "申买价二" << ","
+				<< "申买量二" << ","
+				<< "申卖价二" << ","
+				<< "申卖量二" << ","
+
+				<< "申买价三" << ","
+				<< "申买量三" << ","
+				<< "申卖价三" << ","
+				<< "申卖量三" << ","
+
+
+				<< "申买价四" << ","
+				<< "申买量四" << ","
+				<< "申卖价四" << ","
+				<< "申卖量四" << ","
+
+				<< "申买价五" << ","
+				<< "申买量五" << ","
+				<< "申卖价五" << ","
+				<< "申卖量五" << std::endl;
+		}
+		else
+		{
+			outFile
+				<< "合约代码" << ","
+				//<<"交易日"<<","
+				//<< "上次结算价" << ","
+				//<< "昨持仓量" << ","
+				//<< "涨停板价" << ","
+				//<< "跌停板价" << ","
+				//<< "今开盘" << ","
+				//<< "最高价" << ","
+				//<< "最低价" << ","
+				<< "最后修改时间" << ","
+				<< "最后修改毫秒" << ","
+				<< "最新价" << ","
+				<< "数量" << ","
+				//<< "成交金额" << ","
+				<< "持仓量" << ","
+				//<< "今收盘" << ","
+				//<< "本次结算价" << ","
+				<< "申买价一" << ","
+				<< "申买量一" << ","
+				<< "申卖价一" << ","
+				<< "申卖量一" //<< ","
+						  //<< "现手" << ","
+						  //<< "增仓" << ","
+						  //<< "方向"
+				<< std::endl;
+		}
+		
 		outFile.close();
-
 		gmap_FilepathInstrument.insert(pair<string, string>(g_vcInstrumentIDFilterStr[i], string(m_chMdcsvFileName)));
-
 	}
-	
-	/*memset(&m_chMdPankouFileName, 0, sizeof(TThostFtdcMdcsvFileName)); //盘口文件
-	sprintf(m_chMdPankouFileName, "%s_market_pankou_data%d%02d%02d%02d%02d.csv", g_chInstrumentIDFilestr, mt->tm_year + 1900, mt->tm_mon + 1, mt->tm_mday, mt->tm_hour, mt->tm_min);
-	std::ofstream outPamkouFile;
-	outPamkouFile.open(m_chMdPankouFileName, std::ios::out); // 新盘口开文件
-	outPamkouFile << "上次结算价" << ","
-		<< "昨持仓量" << ","
-		<< "涨停板价" << ","
-		<< "跌停板价" << ","
-		<< "今开盘价" << ","
-		<< "最高价" << ","
-		<< "最低价" << std::endl;
-	outPamkouFile.close();*/
-
 }
 
 void writePankouDatatoCSVFile()
@@ -417,8 +423,7 @@ void writeTickDataCSVFile()
 
 	//while (true)
 	while (WaitForSingleObject(CloseSignalReady, 0) != WAIT_OBJECT_0)//设置CloseSignalReady信号，线程退出
-	{
-		//Sleep(210);
+	{		
 		map<string, string>::iterator itor;
 		struct CMDTickdata structTickData;
 		while (tickWriteDataQueue.try_dequeue(structTickData))
@@ -426,21 +431,64 @@ void writeTickDataCSVFile()
 			itor = gmap_FilepathInstrument.find(string(structTickData.cInstrumentID));
 			if (itor != gmap_FilepathInstrument.end())
 			{
-				//strcpy_s(m_chMdcsvFileName, itor->second.c_str());
-				std::ofstream outFile;				
-				outFile.open(itor->second.c_str(), std::ios::app); // 文件追加写入 
-				outFile << structTickData.cInstrumentID << ","
-					<< structTickData.cUpdatetime << ","     //最后修改时间
-					<< structTickData.iMilitime << ","  //毫秒
-					<< structTickData.dwLastPrice << ","   //最新价
-					<< structTickData.iVolume << ","  //数量
-					<< structTickData.dwOpenInterest << ","  //持仓量
-					<< structTickData.dwBidPrice1 << ","    //买一价
-					<< structTickData.iBidVolume1 << ","   //买一量
-					<< structTickData.dwAskPrice1 << ","   //卖一价
-					<< structTickData.iAskVolume1       //卖一量
-					<< std::endl;
-				outFile.close();
+
+				map<string, string>::iterator itorshfe;
+				itorshfe = g_mapSHFEInstrument.find(string(structTickData.cInstrumentID));
+				if (itorshfe != g_mapSHFEInstrument.end())
+				{
+					std::ofstream outFile;
+					outFile.open(itor->second.c_str(), std::ios::app); // 文件追加写入 
+					outFile << structTickData.cInstrumentID << ","
+						<< structTickData.cUpdatetime << ","     //最后修改时间
+						<< structTickData.iMilitime << ","  //毫秒
+						<< structTickData.dwLastPrice << ","   //最新价
+						<< structTickData.iVolume << ","  //数量
+						<< structTickData.dwOpenInterest << ","  //持仓量
+						<< structTickData.dwBidPrice1 << ","    //买一价
+						<< structTickData.iBidVolume1 << ","   //买一量
+						<< structTickData.dwAskPrice1 << ","   //卖一价
+						<< structTickData.iAskVolume1 << ","     //卖一量
+
+						<< structTickData.dwBidPrice2 << ","    //买二价
+						<< structTickData.iBidVolume2 << ","   //买二量
+						<< structTickData.dwAskPrice2 << ","   //卖二价
+						<< structTickData.iAskVolume2 << ","     //卖二量
+
+						<< structTickData.dwBidPrice3 << ","    //买三价
+						<< structTickData.iBidVolume3 << ","   //买三量
+						<< structTickData.dwAskPrice3 << ","   //卖三价
+						<< structTickData.iAskVolume3 << ","     //卖三量
+
+						<< structTickData.dwBidPrice4 << ","    //买四价
+						<< structTickData.iBidVolume4 << ","   //买四量
+						<< structTickData.dwAskPrice4 << ","   //卖四价
+						<< structTickData.iAskVolume4 << ","     //卖四量
+
+						<< structTickData.dwBidPrice5 << ","    //买五价
+						<< structTickData.iBidVolume5 << ","   //买五量
+						<< structTickData.dwAskPrice5 << ","   //卖五价
+						<< structTickData.iAskVolume5       //卖五量
+						<< std::endl;
+					outFile.close();
+
+				}
+				else
+				{
+					std::ofstream outFile;
+					outFile.open(itor->second.c_str(), std::ios::app); // 文件追加写入 
+					outFile << structTickData.cInstrumentID << ","
+						<< structTickData.cUpdatetime << ","     //最后修改时间
+						<< structTickData.iMilitime << ","  //毫秒
+						<< structTickData.dwLastPrice << ","   //最新价
+						<< structTickData.iVolume << ","  //数量
+						<< structTickData.dwOpenInterest << ","  //持仓量
+						<< structTickData.dwBidPrice1 << ","    //买一价
+						<< structTickData.iBidVolume1 << ","   //买一量
+						<< structTickData.dwAskPrice1 << ","   //卖一价
+						<< structTickData.iAskVolume1       //卖一量
+						<< std::endl;
+					outFile.close();
+				}
 			}
 		}
 	}
@@ -699,14 +747,27 @@ unsigned int __stdcall writeDataThreadProc(void * data)
 
 	*/
 
+
+
+	PARAMTOCHARTS paramTrans;
+	memset(&paramTrans, 0, sizeof(PARAMTOCHARTS));
+	paramTrans.strMessage = "writeDataThreadProc Thread terminate!";
+	PostMessageToDlg(paramTrans);
+
 	_endthreadex(0);
 	return 0;
 }
 
 unsigned int __stdcall waitForConDisconnectThreadProc(void * data)
 {
-	WaitForSingleObject(ConDisconnetSignalReady, INFINITE);
-		nConDisconnect = 1;
+	WaitForSingleObject(CloseSignalReady, INFINITE);
+		//nConDisconnect = 1;
+
+
+		PARAMTOCHARTS paramTrans;
+		memset(&paramTrans, 0, sizeof(PARAMTOCHARTS));
+		paramTrans.strMessage = "waitForConDisconnectThreadProc Thread terminate!";
+		PostMessageToDlg(paramTrans);
 
 	_endthreadex(0);
 	return 0;
@@ -715,172 +776,7 @@ unsigned int __stdcall waitForConDisconnectThreadProc(void * data)
 
 
 
-template <typename T>
-string get_delta_str(T pre, T data)
-{
-	string offset_str = "";
-	if (data > pre)
-	{
-		offset_str = "(+" + to_string(data - pre) + ")";
-	}
-	else if (data < pre)
-	{
-		offset_str = "(-" + to_string(pre - data) + ")";
-	}
-	return offset_str;
-}
 
-open_interest_delta_forward_enum get_open_interest_delta_forward(int open_interest_delta, int volume_delta)
-{	/*根据成交量的差和持仓量的差来获取仓位变化的方向
-	return : open_interest_delta_forward_enum
-	*/
-	open_interest_delta_forward_enum local_open_interest_delta_forward;
-	if (open_interest_delta == 0 && volume_delta == 0)
-		local_open_interest_delta_forward = open_interest_delta_forward_enum::NONE;
-	else if (open_interest_delta == 0 && volume_delta > 0)
-		local_open_interest_delta_forward = open_interest_delta_forward_enum::EXCHANGE;
-	else if (open_interest_delta > 0)
-	{
-		if (open_interest_delta - volume_delta == 0)
-			local_open_interest_delta_forward = open_interest_delta_forward_enum::OPENFWDOUBLE;
-		else
-			local_open_interest_delta_forward = open_interest_delta_forward_enum::OPEN;
-	}
-	else if (open_interest_delta < 0)
-	{
-		if (open_interest_delta + volume_delta == 0)
-			local_open_interest_delta_forward = open_interest_delta_forward_enum::CLOSEFWDOUBLE;
-		else
-			local_open_interest_delta_forward = open_interest_delta_forward_enum::CLOSE;
-	}
-	return local_open_interest_delta_forward;
-}
-
-order_forward_enum get_order_forward(double last_price, double ask_price1, double bid_price1,
-	double pre_last_price, double pre_ask_price1, double pre_bid_price1)
-{
-	enum order_forward_enum local_order_forward;
-	//获取成交的区域，根据当前tick的成交价和上个tick的ask和bid价格进行比对
-	if (last_price >= pre_ask_price1)
-	{
-		local_order_forward = order_forward_enum::UP;
-	}
-	else if (last_price <= pre_bid_price1)
-	{
-		local_order_forward = order_forward_enum::DOWN;
-	}
-	else
-	{
-		if (last_price >= ask_price1)
-		{
-			local_order_forward = order_forward_enum::UP;
-		}
-		else if (last_price <= bid_price1)
-		{
-			local_order_forward = order_forward_enum::DOWN;
-		}
-		else
-		{
-			local_order_forward = order_forward_enum::TICKMIDDLE;
-		}
-	}
-	return local_order_forward;
-}
-
-void init_tick_type_dict()
-{
-	TICK_TYPE tick_type;
-	tick_type[tick_type_key_enum::TICKTYPE] = tick_type_enum::NOCHANGE;
-	tick_type[tick_type_key_enum::TICKCOLOR] = tick_color_enum::WHITE;
-	m_tick_type_dict[open_interest_delta_forward_enum::NONE][order_forward_enum::UP] = tick_type;
-	m_tick_type_dict[open_interest_delta_forward_enum::NONE][order_forward_enum::DOWN] = tick_type;
-	m_tick_type_dict[open_interest_delta_forward_enum::NONE][order_forward_enum::TICKMIDDLE] = tick_type;
-
-	tick_type[tick_type_key_enum::TICKTYPE] = tick_type_enum::EXCHANGELONG;
-	tick_type[tick_type_key_enum::TICKCOLOR] = tick_color_enum::RED;
-	m_tick_type_dict[open_interest_delta_forward_enum::EXCHANGE][order_forward_enum::UP] = tick_type;
-	tick_type[tick_type_key_enum::TICKTYPE] = tick_type_enum::EXCHANGESHORT;
-	tick_type[tick_type_key_enum::TICKCOLOR] = tick_color_enum::GREEN;
-	m_tick_type_dict[open_interest_delta_forward_enum::EXCHANGE][order_forward_enum::DOWN] = tick_type;
-	tick_type[tick_type_key_enum::TICKTYPE] = tick_type_enum::EXCHANGEUNKOWN;
-	tick_type[tick_type_key_enum::TICKCOLOR] = tick_color_enum::WHITE;
-	m_tick_type_dict[open_interest_delta_forward_enum::EXCHANGE][order_forward_enum::TICKMIDDLE] = tick_type;
-
-	tick_type[tick_type_key_enum::TICKTYPE] = tick_type_enum::OPENDOUBLE;
-	tick_type[tick_type_key_enum::TICKCOLOR] = tick_color_enum::RED;
-	m_tick_type_dict[open_interest_delta_forward_enum::OPENFWDOUBLE][order_forward_enum::UP] = tick_type;
-	tick_type[tick_type_key_enum::TICKTYPE] = tick_type_enum::OPENDOUBLE;
-	tick_type[tick_type_key_enum::TICKCOLOR] = tick_color_enum::GREEN;
-	m_tick_type_dict[open_interest_delta_forward_enum::OPENFWDOUBLE][order_forward_enum::DOWN] = tick_type;
-	tick_type[tick_type_key_enum::TICKTYPE] = tick_type_enum::OPENDOUBLE;
-	tick_type[tick_type_key_enum::TICKCOLOR] = tick_color_enum::WHITE;
-	m_tick_type_dict[open_interest_delta_forward_enum::OPENFWDOUBLE][order_forward_enum::TICKMIDDLE] = tick_type;
-
-	tick_type[tick_type_key_enum::TICKTYPE] = tick_type_enum::OPENLONG;
-	tick_type[tick_type_key_enum::TICKCOLOR] = tick_color_enum::RED;
-	m_tick_type_dict[open_interest_delta_forward_enum::OPEN][order_forward_enum::UP] = tick_type;
-	tick_type[tick_type_key_enum::TICKTYPE] = tick_type_enum::OPENSHORT;
-	tick_type[tick_type_key_enum::TICKCOLOR] = tick_color_enum::GREEN;
-	m_tick_type_dict[open_interest_delta_forward_enum::OPEN][order_forward_enum::DOWN] = tick_type;
-	tick_type[tick_type_key_enum::TICKTYPE] = tick_type_enum::OPENUNKOWN;
-	tick_type[tick_type_key_enum::TICKCOLOR] = tick_color_enum::WHITE;
-	m_tick_type_dict[open_interest_delta_forward_enum::OPEN][order_forward_enum::TICKMIDDLE] = tick_type;
-
-	tick_type[tick_type_key_enum::TICKTYPE] = tick_type_enum::CLOSEDOUBLE;
-	tick_type[tick_type_key_enum::TICKCOLOR] = tick_color_enum::RED;
-	m_tick_type_dict[open_interest_delta_forward_enum::CLOSEFWDOUBLE][order_forward_enum::UP] = tick_type;
-	tick_type[tick_type_key_enum::TICKTYPE] = tick_type_enum::CLOSEDOUBLE;
-	tick_type[tick_type_key_enum::TICKCOLOR] = tick_color_enum::GREEN;
-	m_tick_type_dict[open_interest_delta_forward_enum::CLOSEFWDOUBLE][order_forward_enum::DOWN] = tick_type;
-	tick_type[tick_type_key_enum::TICKTYPE] = tick_type_enum::CLOSEDOUBLE;
-	tick_type[tick_type_key_enum::TICKCOLOR] = tick_color_enum::WHITE;
-	m_tick_type_dict[open_interest_delta_forward_enum::CLOSEFWDOUBLE][order_forward_enum::TICKMIDDLE] = tick_type;
-
-	tick_type[tick_type_key_enum::TICKTYPE] = tick_type_enum::CLOSESHORT;
-	tick_type[tick_type_key_enum::TICKCOLOR] = tick_color_enum::RED;
-	m_tick_type_dict[open_interest_delta_forward_enum::CLOSE][order_forward_enum::UP] = tick_type;
-	tick_type[tick_type_key_enum::TICKTYPE] = tick_type_enum::CLOSELONG;
-	tick_type[tick_type_key_enum::TICKCOLOR] = tick_color_enum::GREEN;
-	m_tick_type_dict[open_interest_delta_forward_enum::CLOSE][order_forward_enum::DOWN] = tick_type;
-	tick_type[tick_type_key_enum::TICKTYPE] = tick_type_enum::CLOSEUNKOWN;
-	tick_type[tick_type_key_enum::TICKCOLOR] = tick_color_enum::WHITE;
-	m_tick_type_dict[open_interest_delta_forward_enum::CLOSE][order_forward_enum::TICKMIDDLE] = tick_type;
-}
-
-void init_handicap_dict()
-{
-	m_handicap_dict[tick_type_enum::OPENLONG][opponent_key_enum::OPPOSITE] = tick_type_enum::CLOSELONG;
-	m_handicap_dict[tick_type_enum::OPENLONG][opponent_key_enum::SIMILAR] = tick_type_enum::OPENSHORT;
-
-	m_handicap_dict[tick_type_enum::OPENSHORT][opponent_key_enum::OPPOSITE] = tick_type_enum::CLOSESHORT;
-	m_handicap_dict[tick_type_enum::OPENSHORT][opponent_key_enum::SIMILAR] = tick_type_enum::OPENLONG;
-
-	m_handicap_dict[tick_type_enum::CLOSELONG][opponent_key_enum::OPPOSITE] = tick_type_enum::OPENLONG;
-	m_handicap_dict[tick_type_enum::CLOSELONG][opponent_key_enum::SIMILAR] = tick_type_enum::CLOSESHORT;
-
-	m_handicap_dict[tick_type_enum::CLOSESHORT][opponent_key_enum::OPPOSITE] = tick_type_enum::OPENSHORT;
-	m_handicap_dict[tick_type_enum::CLOSESHORT][opponent_key_enum::SIMILAR] = tick_type_enum::CLOSELONG;
-}
-
-void init_tick_type_str_dict()
-{
-	m_tick_type_str_dict[tick_type_enum::OPENLONG] = "多开";
-	m_tick_type_str_dict[tick_type_enum::OPENSHORT] = "空开";
-	m_tick_type_str_dict[tick_type_enum::OPENDOUBLE] = "双开";
-	m_tick_type_str_dict[tick_type_enum::CLOSELONG] = "多平";
-	m_tick_type_str_dict[tick_type_enum::CLOSESHORT] = "空平";
-	m_tick_type_str_dict[tick_type_enum::CLOSEDOUBLE] = "双平";
-	m_tick_type_str_dict[tick_type_enum::EXCHANGELONG] = "多换";
-	m_tick_type_str_dict[tick_type_enum::EXCHANGESHORT] = "空换";
-	m_tick_type_str_dict[tick_type_enum::OPENUNKOWN] = "未知开仓";
-	m_tick_type_str_dict[tick_type_enum::CLOSEUNKOWN] = "未知平仓";
-	m_tick_type_str_dict[tick_type_enum::EXCHANGEUNKOWN] = "未知换仓";
-	m_tick_type_str_dict[tick_type_enum::UNKOWN] = "未知";
-	m_tick_type_str_dict[tick_type_enum::NOCHANGE] = "没有变化";
-	m_color_type_str_dict[tick_color_enum::RED] = "红";
-	m_color_type_str_dict[tick_color_enum::GREEN] = "绿";
-	m_color_type_str_dict[tick_color_enum::WHITE] = "白";
-}
 
 unsigned int __stdcall CalculateAndAnalysisThreadProc(void * data)
 {
@@ -1010,6 +906,12 @@ unsigned int __stdcall CalculateAndAnalysisThreadProc(void * data)
 			}
 		}
 	}
+
+	PARAMTOCHARTS paramTrans;
+	memset(&paramTrans, 0, sizeof(PARAMTOCHARTS));
+	paramTrans.strMessage = "CalculateAndAnalysisThreadProc Thread terminate!";
+	PostMessageToDlg(paramTrans);
+
 	_endthreadex(0);
 	return 0;
 
@@ -1127,18 +1029,19 @@ void CSimpleHandler::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument, 
 			{
 				string strPre = strInstruct.substr(0, 3); //前3个字符串为SPC,SPD,STD,STG， 应该为组合合约，忽略不查询
 				string strPre2 = strInstruct.substr(0, 2);
-				
-				
-				if (!(strPre == "SPC" || strPre == "SPD" || strPre == "STD" || strPre == "STG"
+				if (!(strPre == "SPC" || strPre == "SPD" 
+					|| strPre == "STD" || strPre == "STG"
 					|| strPre == "PRT" || strPre == "IPS"
 					|| strPre2 == "SP"))
-
-				//string strTestrb2008 = strInstruct.substr(0, 6);
-				//if(strTestrb2008 == "fu2009")
+				{
 					md_InstrumentID.push_back(pInstrument->InstrumentID);
-
-
-
+					string strExchangeID = string(pInstrument->ExchangeID);
+					if (strExchangeID == string("SHFE"))
+					{
+						g_mapSHFEInstrument.insert(pair<string, string>(strInstruct, strExchangeID));
+					}					
+				}
+					
 			}
 		}			
 	}
@@ -1276,6 +1179,12 @@ unsigned int __stdcall TradeThreadProc(void * data)
 
 
 	WaitForSingleObject(CloseSignalReady, INFINITE);
+	pUserApi->Release();
+
+	PARAMTOCHARTS paramTrans;
+	memset(&paramTrans, 0, sizeof(PARAMTOCHARTS));
+	paramTrans.strMessage = "TradeThreadProc Thread terminate!";
+	PostMessageToDlg(paramTrans);
 
 	_endthreadex(0);
 	return 0;

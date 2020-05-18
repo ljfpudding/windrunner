@@ -1,148 +1,11 @@
 #pragma once
 
-#include <map>
-#include <vector>
-#include <string>
-#include <list>
-#include <memory>
-#include <io.h>
-#include <direct.h>
-
+#include "CommonDef.h"
 #include "CtpAPILibrary\ThostFtdcTraderApi.h"
 #include "CtpAPILibrary\ThostFtdcMdApi.h"
-#include "CtpAPILibrary\ThostFtdcUserApiDataType.h"
-#include "getconfig.h"
-#include "readerwriterqueue.h"
-
-
-extern HANDLE LoginSignalReady;
-extern HANDLE SubscribeSignalReady;
-extern HANDLE CloseSignalReady;
-extern HANDLE writeFileNameSignalReady;
-extern HANDLE ReceiveDepDataSignalReady;
-extern HANDLE writeDepDataSignalReady;
-extern HANDLE TickSignalReady;
-extern HANDLE ConDisconnetSignalReady;
-extern HANDLE hCalAnalysis;
-extern HANDLE MkdirSignalReady;
-
-
-//盘口数据结构
-struct CMDPankoudata
-{
-	double dwPreSettlementPrice;
-	double dwPreOpenInterest;
-	double dwUpperLimitPrice;
-	double dwLowerLimitPrice;
-	double dwOpenPrice;
-	double dwHighestPrice;
-	double dwLowestPrice;
-};
-
-//tick数据结构
-typedef struct CMDTickdata
-{
-	char	cInstrumentID[31];
-	char	cExchangeIDType[9];//交易所代码 SHFE上交所，默认可以有五档行情，DCE等其他交易所需要交费才有五档行情
-	char	cUpdatetime[9];
-	int		iMilitime;
-	double	dwLastPrice;
-	int		iVolume;
-	double  dwOpenInterest;
-	double	dwBidPrice1;
-	int		iBidVolume1;
-	double	dwAskPrice1;
-	int		iAskVolume1;
-	int		iOpenDelta;
-	char	cInformation[50];
-	int		nIndex;//Price索引，为了计算各个指标方便。
-
-	double	dwBidPrice2;
-	int		iBidVolume2;
-	double	dwAskPrice2;
-	int		iAskVolume2;
-
-	double	dwBidPrice3;
-	int		iBidVolume3;
-	double	dwAskPrice3;
-	int		iAskVolume3;
-
-	double	dwBidPrice4;
-	int		iBidVolume4;
-	double	dwAskPrice4;
-	int		iAskVolume4;
-
-	double	dwBidPrice5;
-	int		iBidVolume5;
-	double	dwAskPrice5;
-	int		iAskVolume5;
-
-}MDTICKDATA;
-
-using namespace std;
-using namespace moodycamel;
-
-typedef char  TThostFtdcMdcsvFileName[256];  //存储行情明细的文件名
-typedef char TThostFtdcMdPankouFileName[256]; //存储盘口的文件名  主要是昨结算价  涨停价  跌停价
-typedef char CHInstrumentID[31];
-
-extern char targetpath[1024];
-extern vector<string>      g_vcInstrumentIDFilterStr;
-extern TThostFtdcMdcsvFileName     m_chMdcsvFileName;
-extern TThostFtdcMdPankouFileName  m_chMdPankouFileName;
-extern CHInstrumentID              g_chInstrumentIDFilestr;
-extern list<struct CMDPankoudata> listPankou;
-extern MDTICKDATA structTickData;
-extern ReaderWriterQueue<MDTICKDATA> tickDataQueue;
-
-
-/// 会员代码
-extern TThostFtdcBrokerIDType g_chBrokerID;
-/// 交易用户代码
-extern TThostFtdcUserIDType g_chUserID;
-/// 交易用户密码
-extern TThostFtdcPasswordType g_chPassword;
-/// 交易所代码
-extern TThostFtdcExchangeIDType g_chExchangeID;
-///合约代码
-extern TThostFtdcInstrumentIDType	g_chInstrumentID;
-///投资者代码
-extern TThostFtdcInvestorIDType g_chInvestorID;
-///预埋撤单编号
-extern TThostFtdcParkedOrderActionIDType	g_chParkedOrderActionID1;
-///预埋报单编号
-extern TThostFtdcParkedOrderIDType	g_chParkedOrderID1;
-///报单引用
-extern TThostFtdcOrderRefType	g_chOrderRef;
-///前置编号
-extern TThostFtdcFrontIDType	g_chFrontID;
-///会话编号
-extern TThostFtdcSessionIDType	g_chSessionID;
-///报单编号
-extern TThostFtdcOrderSysIDType	g_chOrderSysID;
-///止损价
-extern TThostFtdcPriceType	g_chStopPrice;
-///报价引用
-extern TThostFtdcOrderRefType	g_chQuoteRef;
-
-///认证码
-extern TThostFtdcAuthCodeType	g_chAuthCode;
-///App代码
-extern TThostFtdcAppIDType	g_chAppID;
-
-//==========
-///前置编号
-extern TThostFtdcFrontIDType	g_NewFrontID;
-///会话编号
-extern TThostFtdcSessionIDType	g_NewSessionID;
-
-
-
-
 
 class CVolumeIndicatorMDSpi : public CThostFtdcMdSpi
 {
-
 public:
 	// 构造函数，需要一个有效的指向CThostFtdcMduserApi实例的指针
 	CVolumeIndicatorMDSpi(CThostFtdcMdApi *pUserApi);
@@ -154,8 +17,7 @@ public:
 	virtual void OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 	virtual void OnRspSubMarketData(CThostFtdcSpecificInstrumentField *pSpecificInstrument,	CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);	
 	virtual void OnRtnDepthMarketData(CThostFtdcDepthMarketDataField *pDepthMarketData);
-
-
+	
 	int ReqUserLogin();
 	int SubscribeMarketData();
 
@@ -165,7 +27,6 @@ private:
 	bool m_bPankouData = false;
 	MDTICKDATA m_preTickData;//当丢数据时候，程序自动补充一个临时数据。
 	static int m_nIndex;
-
 };
 
 class CVolumeIndicatorMDApi : public CThostFtdcMdApi
@@ -190,8 +51,7 @@ public:
 	{
 		return m_pApi->GetApiVersion();
 	}
-
-
+	
 	///订阅行情。
 	///@param ppInstrumentID 合约ID  
 	///@param nCount 要订阅/退订行情的合约个数
@@ -302,11 +162,7 @@ public:
 	virtual void RegisterSpi(CThostFtdcMdSpi *pSpi)
 	{
 		m_pApi->RegisterSpi(pSpi);
-	}
-
-
+	}	
 };
-
-
 //============================================================================================
 

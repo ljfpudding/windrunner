@@ -404,6 +404,11 @@ unsigned int __stdcall CalculateStrategyThreadProc(void * data)
 
 	WaitForSingleObject(CloseSignalReady, INFINITE);
 
+	PARAMTOCHARTS paramTrans;
+	memset(&paramTrans, 0, sizeof(PARAMTOCHARTS));
+	paramTrans.strMessage = "CalculateStrategyThreadProc Thread terminate!";
+	PostMessageToDlg(paramTrans);
+
 	_endthreadex(0);
 	return 0;
 }

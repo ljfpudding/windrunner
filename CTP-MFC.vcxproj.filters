@@ -183,6 +183,9 @@
     <ClInclude Include="define.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="CommonDef.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CTP-MFC.cpp">
@@ -288,6 +291,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="traderSpi.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CommonDef.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

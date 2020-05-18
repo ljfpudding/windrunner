@@ -197,6 +197,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="atomicops.h" />
+    <ClInclude Include="CommonDef.h" />
     <ClInclude Include="CTP-MFC.h" />
     <ClInclude Include="CTP-MFCDlg.h" />
     <ClInclude Include="CtpAPILibrary\ThostFtdcMdApi.h" />
@@ -250,6 +251,7 @@
     <ClInclude Include="VolumeIndicatorMD.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CommonDef.cpp" />
     <ClCompile Include="CTP-MFC.cpp" />
     <ClCompile Include="CTP-MFCDlg.cpp" />
     <ClCompile Include="getconfig.cpp" />

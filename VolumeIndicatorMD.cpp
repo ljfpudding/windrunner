@@ -1,86 +1,8 @@
 #include "stdafx.h"
-
-#include <iostream>
-#include <fstream>
-#include <stdio.h>
-#include <windows.h>
-#include <time.h>
-
-
 #include "VolumeIndicatorMD.h"
-#include "readerwriterqueue.h"
 #include "CTP-MFC.h"
 #include "CTP-MFCDlg.h"
 #include "ThreadWorkLogic.h"
-
-
-using namespace moodycamel;
-using namespace std;
-
-HANDLE LoginSignalReady = CreateEvent(NULL, false, false, NULL);
-HANDLE SubscribeSignalReady = CreateEvent(NULL, false, false, NULL);
-HANDLE CloseSignalReady = CreateEvent(NULL, true, false, NULL);//结束所有线程信号，为手动方式
-HANDLE writeFileNameSignalReady = CreateEvent(NULL, false, false, NULL);
-HANDLE ReceiveDepDataSignalReady = CreateEvent(NULL, false, false, NULL);
-HANDLE writeDepDataSignalReady = CreateEvent(NULL, false, false, NULL);
-HANDLE TickSignalReady = CreateEvent(NULL, false, false, NULL);
-HANDLE ConDisconnetSignalReady = CreateEvent(NULL, false, false, NULL);
-HANDLE MkdirSignalReady = CreateEvent(NULL, false, false, NULL);
-
-
-MDTICKDATA structTickData;
-
-ReaderWriterQueue<MDTICKDATA> tickDataQueue;
-
-TThostFtdcMdcsvFileName     m_chMdcsvFileName = {0};
-TThostFtdcMdPankouFileName  m_chMdPankouFileName = {0};
-CHInstrumentID              g_chInstrumentIDFilestr = { 0 };
-vector<string>      g_vcInstrumentIDFilterStr;
-char targetpath[1024] = { 0 };
-
-
-list<struct CMDPankoudata> listPankou;
-
-/// 会员代码
-TThostFtdcBrokerIDType g_chBrokerID;
-/// 交易用户代码
-TThostFtdcUserIDType g_chUserID;
-/// 交易用户密码
-TThostFtdcPasswordType g_chPassword;
-/// 交易所代码
-TThostFtdcExchangeIDType g_chExchangeID;
-///合约代码
-TThostFtdcInstrumentIDType	g_chInstrumentID;
-///投资者代码
-TThostFtdcInvestorIDType g_chInvestorID;
-///预埋撤单编号
-TThostFtdcParkedOrderActionIDType	g_chParkedOrderActionID1;
-///预埋报单编号
-TThostFtdcParkedOrderIDType	g_chParkedOrderID1;
-///报单引用
-TThostFtdcOrderRefType	g_chOrderRef;
-///前置编号
-TThostFtdcFrontIDType	g_chFrontID;
-///会话编号
-TThostFtdcSessionIDType	g_chSessionID;
-///报单编号
-TThostFtdcOrderSysIDType	g_chOrderSysID;
-///止损价
-TThostFtdcPriceType	g_chStopPrice;
-///报价引用
-TThostFtdcOrderRefType	g_chQuoteRef;
-
-///认证码
-TThostFtdcAuthCodeType	g_chAuthCode;
-///App代码
-TThostFtdcAppIDType	g_chAppID;
-
-//==========
-///前置编号
-TThostFtdcFrontIDType	g_NewFrontID;
-///会话编号
-TThostFtdcSessionIDType	g_NewSessionID;
-
 
 int CVolumeIndicatorMDSpi::m_nIndex = 0;
 
@@ -219,10 +141,10 @@ void CVolumeIndicatorMDSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUser
 			if (_access(targetpath, 0) == -1)
 			{
 				_mkdir(targetpath);
-				SetEvent(MkdirSignalReady);
+				//SetEvent(MkdirSignalReady);
 			}
 			SetEvent(SubscribeSignalReady);
-			memset(&m_preTickData, 0, sizeof(MDTICKDATA)); //再次登录的时候,重置这个pre.
+			//memset(&m_preTickData, 0, sizeof(MDTICKDATA)); //再次登录的时候,重置这个pre.
 		}
 }
 
@@ -234,18 +156,14 @@ void CVolumeIndicatorMDSpi::OnRspSubMarketData(CThostFtdcSpecificInstrumentField
 		if (pSpecificInstrument != NULL)
 		{
 			strcpy_s(g_chInstrumentIDFilestr, pSpecificInstrument->InstrumentID);
-			g_vcInstrumentIDFilterStr.push_back(g_chInstrumentIDFilestr);
-			
+			g_vcInstrumentIDFilterStr.push_back(g_chInstrumentIDFilestr);			
 		}
 
 		if (bIsLast)
 		{
-
 			theApp.GetMainWnd()->PostMessageW(WM_HEYUEPREPARED, 0, 0);
-
 			SetEvent(writeFileNameSignalReady);
-			SetEvent(ReceiveDepDataSignalReady);
-			//SetEvent(writeDepDataSignalReady);
+			SetEvent(ReceiveDepDataSignalReady);			
 		}
 	}
 }
