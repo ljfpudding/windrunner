@@ -247,10 +247,17 @@ unsigned int __stdcall fetchMDThreadProc(void * data)
 	pUserMdApi->RegisterSpi(&ash);
 	pUserMdApi->RegisterFront(const_cast<char *>(g_chFrontMdaddr.c_str()));
 
-
 	_getcwd(targetpath, sizeof(targetpath));
 
-	WaitForSingleObject(hMDThreadToStartSignalReady, INFINITE);
+	if (::WaitForSingleObject(hMDThreadToStartSignalReady, 1000 * 60) == WAIT_TIMEOUT)//超时一分钟，针对服务器没有开的情况
+	{
+		WaitForSingleObject(CloseSignalReady, INFINITE);
+
+		pUserMdApi->Release();
+		_endthreadex(0);
+		return 0;
+	}
+
 
 	pUserMdApi->Init();
 	WaitForSingleObject(LoginSignalReady, INFINITE);
@@ -259,9 +266,9 @@ unsigned int __stdcall fetchMDThreadProc(void * data)
 	WaitForSingleObject(SubscribeSignalReady, INFINITE);
 	SubscribeActionPostMessage(1, 0,&ash);
 
-	fireOnEightFiftyeightThirtySeconds(&ash);
+	//fireOnEightFiftyeightThirtySeconds(&ash);
 
-	//WaitForSingleObject(CloseSignalReady, INFINITE);
+	WaitForSingleObject(CloseSignalReady, INFINITE);
 	pUserMdApi->Release();
 
 	PARAMTOCHARTS paramTrans;
@@ -393,6 +400,7 @@ void writeCSVfile()
 	}
 }
 
+/*
 void writePankouDatatoCSVFile()
 {
 
@@ -417,6 +425,7 @@ void writePankouDatatoCSVFile()
 	outPankouFile.close();
 
 }
+*/
 
 void writeTickDataCSVFile()
 {
@@ -716,7 +725,14 @@ void writeTickDatatoCSVFile()
 unsigned int __stdcall writeDataThreadProc(void * data)
 {
 
-	WaitForSingleObject(writeFileNameSignalReady, INFINITE);
+	if (::WaitForSingleObject(writeFileNameSignalReady, 1000 * 60) == WAIT_TIMEOUT)//超时一分钟，针对服务器没有开的情况
+	{
+		WaitForSingleObject(CloseSignalReady, INFINITE);
+		_endthreadex(0);
+		return 0;
+	}
+
+
 	writeCSVfile();
 
 	writeTickDataCSVFile();
@@ -790,7 +806,15 @@ unsigned int __stdcall CalculateAndAnalysisThreadProc(void * data)
 
 	//preStructTickData = 早上开盘读取昨天收盘的最后一条数据; 中间休息时，读取上一次的最后一条数据
 
-	WaitForSingleObject(ReceiveDepDataSignalReady, INFINITE);
+	
+	if (::WaitForSingleObject(ReceiveDepDataSignalReady, 1000 * 60) == WAIT_TIMEOUT)//超时一分钟，针对服务器没有开的情况
+	{
+		WaitForSingleObject(CloseSignalReady, INFINITE);
+		_endthreadex(0);
+		return 0;
+	}
+
+
 		
 	while (WaitForSingleObject(CloseSignalReady, 0)!= WAIT_OBJECT_0)//设置CloseSignalReady信号，线程退出
 	{		
@@ -1165,7 +1189,17 @@ unsigned int __stdcall TradeThreadProc(void * data)
 	pUserApi->SubscribePublicTopic(THOST_TERT_QUICK);
 	pUserApi->RegisterFront(const_cast<char *>(g_chFrontaddr.c_str()));
 	pUserApi->Init();
-	WaitForSingleObject(hTraderConnectSignalReady, INFINITE);
+
+
+	if (::WaitForSingleObject(hTraderConnectSignalReady, 1000 * 60) == WAIT_TIMEOUT)//超时一分钟，针对服务器没有开的情况
+	{
+		WaitForSingleObject(CloseSignalReady, INFINITE);
+
+		pUserApi->Release();
+		_endthreadex(0);
+		return 0;
+	}
+	
 
 	sh.ReqAuthenticate();
 	WaitForSingleObject(hTraderAuthSignalReady, INFINITE);

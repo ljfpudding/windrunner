@@ -14,92 +14,93 @@ HANDLE writeDepDataSignalReady = CreateEvent(NULL, false, false, NULL);
 HANDLE TickSignalReady = CreateEvent(NULL, false, false, NULL);
 HANDLE ConDisconnetSignalReady = CreateEvent(NULL, false, false, NULL);
 HANDLE MkdirSignalReady = CreateEvent(NULL, false, false, NULL);
+HANDLE hCTPTimerCloseSignal = CreateEvent(NULL, false, false, NULL);
 
 
-MDTICKDATA structTickData;
+MDTICKDATA							structTickData;
+ReaderWriterQueue<MDTICKDATA>		tickDataQueue;
 
-ReaderWriterQueue<MDTICKDATA> tickDataQueue;
-
-TThostFtdcMdcsvFileName     m_chMdcsvFileName = { 0 };
-TThostFtdcMdPankouFileName  m_chMdPankouFileName = { 0 };
-CHInstrumentID              g_chInstrumentIDFilestr = { 0 };
-vector<string>      g_vcInstrumentIDFilterStr;
-char targetpath[1024] = { 0 };
+TThostFtdcMdcsvFileName				m_chMdcsvFileName = { 0 };
+TThostFtdcMdPankouFileName			m_chMdPankouFileName = { 0 };
+CHInstrumentID						g_chInstrumentIDFilestr = { 0 };
+vector<string>						g_vcInstrumentIDFilterStr;
+char								targetpath[1024] = { 0 };
 
 
-list<struct CMDPankoudata> listPankou;
+
 
 /// 会员代码
-TThostFtdcBrokerIDType g_chBrokerID;
+TThostFtdcBrokerIDType				g_chBrokerID;
 /// 交易用户代码
-TThostFtdcUserIDType g_chUserID;
+TThostFtdcUserIDType				g_chUserID;
 /// 交易用户密码
-TThostFtdcPasswordType g_chPassword;
+TThostFtdcPasswordType				g_chPassword;
 /// 交易所代码
-TThostFtdcExchangeIDType g_chExchangeID;
+TThostFtdcExchangeIDType			g_chExchangeID;
 ///合约代码
-TThostFtdcInstrumentIDType	g_chInstrumentID;
+TThostFtdcInstrumentIDType			g_chInstrumentID;
 ///投资者代码
-TThostFtdcInvestorIDType g_chInvestorID;
+TThostFtdcInvestorIDType			g_chInvestorID;
 ///预埋撤单编号
 TThostFtdcParkedOrderActionIDType	g_chParkedOrderActionID1;
 ///预埋报单编号
-TThostFtdcParkedOrderIDType	g_chParkedOrderID1;
+TThostFtdcParkedOrderIDType			g_chParkedOrderID1;
 ///报单引用
-TThostFtdcOrderRefType	g_chOrderRef;
+TThostFtdcOrderRefType				g_chOrderRef;
 ///前置编号
-TThostFtdcFrontIDType	g_chFrontID;
+TThostFtdcFrontIDType				g_chFrontID;
 ///会话编号
-TThostFtdcSessionIDType	g_chSessionID;
+TThostFtdcSessionIDType				g_chSessionID;
 ///报单编号
-TThostFtdcOrderSysIDType	g_chOrderSysID;
+TThostFtdcOrderSysIDType			g_chOrderSysID;
 ///止损价
-TThostFtdcPriceType	g_chStopPrice;
+TThostFtdcPriceType					g_chStopPrice;
 ///报价引用
-TThostFtdcOrderRefType	g_chQuoteRef;
+TThostFtdcOrderRefType				g_chQuoteRef;
 
 ///认证码
-TThostFtdcAuthCodeType	g_chAuthCode;
+TThostFtdcAuthCodeType				g_chAuthCode;
 ///App代码
-TThostFtdcAppIDType	g_chAppID;
+TThostFtdcAppIDType					g_chAppID;
 
 //==========
 ///前置编号
-TThostFtdcFrontIDType	g_NewFrontID;
+TThostFtdcFrontIDType				g_NewFrontID;
 ///会话编号
-TThostFtdcSessionIDType	g_NewSessionID;
+TThostFtdcSessionIDType				g_NewSessionID;
 
 
-HANDLE hFetchMD = NULL; //获取行情Handle;
-HANDLE hWriteData = NULL;//写data到文件;
-HANDLE hWaitForConDisconnect = NULL;
-HANDLE hCalAnalysis = NULL;
-
-HANDLE  hTradeThreadProc = NULL;//交易Thread
-
-int nConDisconnect = 0; //是否ConDisconnect
-
-HANDLE hTraderAuthSignalReady = CreateEvent(NULL, false, false, NULL);//Trader Auth Ready
-HANDLE hTraderLoginSignalReady = CreateEvent(NULL, false, false, NULL);//Trader Login Ready
-HANDLE hTraderConnectSignalReady = CreateEvent(NULL, false, false, NULL);//Trader Connect Ready
-HANDLE hMDThreadToStartSignalReady = CreateEvent(NULL, false, false, NULL);//Trader Connect Ready
+HANDLE			hFetchMD = NULL; //获取行情Handle;
+HANDLE			hWriteData = NULL;//写data到文件;
+HANDLE			hWaitForConDisconnect = NULL;
+HANDLE			hCalAnalysis = NULL;
+HANDLE			hTradeThreadProc = NULL;//交易Thread 
+HANDLE			hCTPTimerThreadProc = NULL;
 
 
-CThostFtdcDepthMarketDataField m_preDepthMarketData;
-TICK_TYPE_DICT m_tick_type_dict;
-HANDICAP_DICT m_handicap_dict;
-TICK_TYPE_STR_DICT m_tick_type_str_dict;
-TICK_TYPE_STR_DICT m_color_type_str_dict;
+int									nConDisconnect = 0; //是否ConDisconnect
 
-ReaderWriterQueue<MDTICKDATA> tickWriteDataQueue;
-vector<string> md_InstrumentID;
-map<string, string> gmap_FilepathInstrument;
-spin_mutex sm;
+HANDLE hTraderAuthSignalReady		= CreateEvent(NULL, false, false, NULL);//Trader Auth Ready
+HANDLE hTraderLoginSignalReady		= CreateEvent(NULL, false, false, NULL);//Trader Login Ready
+HANDLE hTraderConnectSignalReady	= CreateEvent(NULL, false, false, NULL);//Trader Connect Ready
+HANDLE hMDThreadToStartSignalReady	= CreateEvent(NULL, false, false, NULL);//Trader Connect Ready
 
 
-map<string, queue<MDTICKDATA>> g_mapPrice;
+CThostFtdcDepthMarketDataField		m_preDepthMarketData;
+TICK_TYPE_DICT		m_tick_type_dict;
+HANDICAP_DICT		m_handicap_dict;
+TICK_TYPE_STR_DICT	m_tick_type_str_dict;
+TICK_TYPE_STR_DICT	m_color_type_str_dict;
+
+ReaderWriterQueue<MDTICKDATA>		tickWriteDataQueue;
+vector<string>						md_InstrumentID;
+map<string, string>					gmap_FilepathInstrument;
+
+spin_mutex			sm;
+
+map<string, queue<MDTICKDATA>>		g_mapPrice;
 map<string, queue<MDTICKDATA>>::iterator selitor;
-map<string, string> g_mapSHFEInstrument;//上海合约，有五档
+map<string, string>					g_mapSHFEInstrument;//上海合约，有五档
 
 
 
@@ -268,4 +269,25 @@ void init_tick_type_str_dict()
 	m_color_type_str_dict[tick_color_enum::RED] = "红";
 	m_color_type_str_dict[tick_color_enum::GREEN] = "绿";
 	m_color_type_str_dict[tick_color_enum::WHITE] = "白";
+}
+
+void ClearCTPData()
+{
+	try
+	{
+		while (tickDataQueue.pop());
+		g_vcInstrumentIDFilterStr.swap(vector<string>());
+		while (tickWriteDataQueue.pop());
+		md_InstrumentID.swap(vector<string>());
+		map<string, string>().swap(gmap_FilepathInstrument);
+		map<string, queue<MDTICKDATA>>().swap(g_mapPrice);
+		map<string, string>().swap(g_mapSHFEInstrument);//上海合约，有五档	
+
+	}
+	catch (...)
+	{
+
+
+	}
+
 }

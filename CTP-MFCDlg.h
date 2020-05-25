@@ -5,11 +5,8 @@
 #pragma once
 
 
+#include "CommonDef.h"
 
-#define WM_MYMSG   WM_USER+88
-#define WM_KDJMSG  WM_USER+89
-#define WM_HEYUEPREPARED	WM_USER+90 //合约就绪
-#define WM_READTESTDATA     WM_USER+91//读取Test Data
 
 
 
@@ -20,16 +17,6 @@
 
 using namespace std;
 
-typedef struct
-{
-	int funcID;
-	double lastX;
-	double deltaX;
-	double alpha;
-	double multY;
-	size_t pntsNmb;
-	size_t period;
-} STRUCT_FUNCDATA;
 
 
 // CCTPMFCDlg 对话框
@@ -65,6 +52,7 @@ public:
 	afx_msg LRESULT OnMyMsgHandler(WPARAM, LPARAM);
 	afx_msg LRESULT OnKDJMsgHandler(WPARAM, LPARAM);
 	afx_msg LRESULT OnHeYuePreparedHandler(WPARAM, LPARAM);
+	afx_msg LRESULT OnCTPTimerHandler(WPARAM, LPARAM);
 	afx_msg LRESULT OnReadTestDataHandler(WPARAM, LPARAM);
 	afx_msg void OnChartVisibilityChanged(NMHDR*, LRESULT*);
 	afx_msg void OnTimer(UINT_PTR nIDEvent);

@@ -12,6 +12,7 @@
 #include   "wingdi.h"
 #include "strategy.h"
 
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -82,11 +83,31 @@ BEGIN_MESSAGE_MAP(CCTPMFCDlg, CDialogEx)
 	ON_MESSAGE(WM_KDJMSG,&CCTPMFCDlg::OnKDJMsgHandler)
 	ON_MESSAGE(WM_HEYUEPREPARED, &CCTPMFCDlg::OnHeYuePreparedHandler)
 	ON_MESSAGE(WM_READTESTDATA, &CCTPMFCDlg::OnReadTestDataHandler)
+	ON_MESSAGE(WM_CTP_TIMER, &CCTPMFCDlg::OnCTPTimerHandler)
 	ON_CBN_SELCHANGE(IDC_COMBO_MD, &CCTPMFCDlg::OnSelComChange)
 	ON_CBN_SELCHANGE(IDC_COMBO_SERVER, &CCTPMFCDlg::OnSelComChangeServer)
 	ON_CBN_SELCHANGE(IDC_COMBO_TIMEINTERVAL, &CCTPMFCDlg::OnSelComChangeTimeInterval)
 	
 END_MESSAGE_MAP()
+
+
+LRESULT CCTPMFCDlg::OnCTPTimerHandler(WPARAM w, LPARAM l)
+{
+	unsigned int nType = (unsigned int)w;
+	if (nType == CTPTimerEnum::STARTWORK)
+	{
+		OnBnClickedButtonFetchmd();
+	}
+	else if (nType == CTPTimerEnum::STOPWORK)
+	{
+
+		OnBnClickedBtnMdClose();
+		ClearCTPData();
+	}
+
+	return 0;
+}
+
 
 
 void CCTPMFCDlg::OnSelComChangeServer()
@@ -284,6 +305,12 @@ BOOL CCTPMFCDlg::OnInitDialog()
 	SetTimer(1, 5000, NULL);
 	SetTimer(2, 1, NULL);
 
+	hCTPTimerThreadProc = (HANDLE)_beginthreadex(NULL, 0, &CTPTimerThreadProc, (LPVOID)this, 0, NULL);
+
+	
+	
+	
+
 	// TODO: 在此添加额外的初始化代码
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -355,6 +382,9 @@ void CCTPMFCDlg::OnBnClickedButtonFetchmd()
 	hCalAnalysis = (HANDLE)_beginthreadex(NULL, 0, &CalculateAndAnalysisThreadProc, (LPVOID)this, 0, NULL);
 	hStrategy = (HANDLE)_beginthreadex(NULL, 0, &CalculateStrategyThreadProc, (LPVOID)this, 0, NULL);
 	hTradeThreadProc = (HANDLE)_beginthreadex(NULL, 0, &TradeThreadProc, (LPVOID)this, 0, NULL);	
+
+	Sleep(500);
+
 }
 
 
@@ -363,6 +393,7 @@ void CCTPMFCDlg::OnBnClickedBtnMdClose()
 	// TODO: 在此添加控件通知处理程序代码
 	SetEvent(CloseSignalReady);	
 	Sleep(2000);
+
 
 	CloseHandle(hFetchMD);
 	CloseHandle(hWriteData);

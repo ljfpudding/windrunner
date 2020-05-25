@@ -13,11 +13,23 @@
 #include <fstream>
 #include <ctime>
 #include <queue>
+#include <malloc.h>
 
 #include "CtpAPILibrary\ThostFtdcUserApiStruct.h"
 #include "CtpAPILibrary\ThostFtdcUserApiDataType.h"
 #include "getconfig.h"
 #include "readerwriterqueue.h"
+
+
+
+#define WM_MYMSG			WM_USER+88
+#define WM_KDJMSG			WM_USER+89
+#define WM_HEYUEPREPARED	WM_USER+90 //合约就绪
+#define WM_READTESTDATA     WM_USER+91//读取Test Data
+#define WM_CTP_TIMER		WM_USER+92
+
+
+
 
 using namespace std;
 using namespace moodycamel;
@@ -32,6 +44,8 @@ extern HANDLE TickSignalReady;
 extern HANDLE ConDisconnetSignalReady;
 extern HANDLE hCalAnalysis;
 extern HANDLE MkdirSignalReady;
+
+extern HANDLE hCTPTimerCloseSignal;
 
 
 
@@ -98,7 +112,7 @@ extern vector<string>      g_vcInstrumentIDFilterStr;
 extern TThostFtdcMdcsvFileName     m_chMdcsvFileName;
 extern TThostFtdcMdPankouFileName  m_chMdPankouFileName;
 extern CHInstrumentID              g_chInstrumentIDFilestr;
-extern list<struct CMDPankoudata> listPankou;
+
 extern MDTICKDATA structTickData;
 extern ReaderWriterQueue<MDTICKDATA> tickDataQueue;
 
@@ -149,6 +163,7 @@ extern HANDLE hFetchMD; //获取行情Handle;
 extern HANDLE hWriteData;//写data到文件;
 extern HANDLE hWaitForConDisconnect;
 extern HANDLE hTradeThreadProc;
+extern HANDLE hCTPTimerThreadProc;
 
 extern HANDLE hTraderAuthSignalReady;//Trader Auth Ready
 extern HANDLE hTraderLoginSignalReady;//Trader Login Ready
@@ -160,6 +175,8 @@ extern unsigned int __stdcall writeDataThreadProc(void * data);
 extern unsigned int __stdcall waitForConDisconnectThreadProc(void * data);
 extern unsigned int __stdcall CalculateAndAnalysisThreadProc(void * data);
 extern unsigned int __stdcall TradeThreadProc(void * data);
+extern unsigned int __stdcall CTPTimerThreadProc(void * data);
+
 
 typedef struct parameterTransToChart
 {
@@ -249,3 +266,10 @@ extern spin_mutex sm;
 extern int nConDisconnect;
 
 extern ReaderWriterQueue<MDTICKDATA> tickWriteDataQueue;
+
+extern void ClearCTPData();
+
+enum CTPTimerEnum
+{
+	STARTWORK,STOPWORK
+};

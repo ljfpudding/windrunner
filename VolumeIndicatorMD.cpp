@@ -136,8 +136,20 @@ void CVolumeIndicatorMDSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUser
 
 		if (bIsLast && ( !pRspInfo->ErrorID ))
 		{
-			
-			sprintf(targetpath, "%s\\%s\\", targetpath, m_pUserMdApi->GetTradingDay());
+			time_t nowtime;
+			nowtime = time(NULL); //获取日历时间  		
+			struct tm local;
+			localtime_s(&local, &nowtime);  //获取当前系统时间  
+
+			if (local.tm_hour == 20)
+			{
+				sprintf(targetpath, "%s\\%s_yepan\\", targetpath, m_pUserMdApi->GetTradingDay());
+			}
+			else
+			{
+				sprintf(targetpath, "%s\\%s\\", targetpath, m_pUserMdApi->GetTradingDay());
+			}
+						
 			if (_access(targetpath, 0) == -1)
 			{
 				_mkdir(targetpath);
@@ -155,8 +167,9 @@ void CVolumeIndicatorMDSpi::OnRspSubMarketData(CThostFtdcSpecificInstrumentField
 	{
 		if (pSpecificInstrument != NULL)
 		{
-			strcpy_s(g_chInstrumentIDFilestr, pSpecificInstrument->InstrumentID);
-			g_vcInstrumentIDFilterStr.push_back(g_chInstrumentIDFilestr);			
+			strcpy_s(g_chInstrumentIDFilestr, pSpecificInstrument->InstrumentID);			
+			g_vcInstrumentIDFilterStr.push_back(g_chInstrumentIDFilestr);
+					
 		}
 
 		if (bIsLast)

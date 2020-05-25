@@ -118,13 +118,14 @@
       <PreprocessorDefinitions>_WINDOWS;_DEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <AdditionalIncludeDirectories>E:\TorGit\CTP-MFC\CTP-MFC\CtpAPILibrary;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>E:\TorGit\ta-lib\c\include;E:\TorGit\CTP-MFC\CTP-MFC\CtpAPILibrary;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>thostmduserapi_se.lib;thosttraderapi_se.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>E:\TorGit\CTP-MFC\CTP-MFC\CtpAPILibrary;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>thostmduserapi_se.lib;thosttraderapi_se.lib;libtcmalloc_minimal.lib;ta_abstract_cdd.lib;ta_libc_cdd.lib;ta_func_cdd.lib;ta_common_cdd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>E:\TorGit\ta-lib\c\lib;E:\TorGit\CTP-MFC\CTP-MFC\CtpAPILibrary;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <OutputFile>$(OutDir)风行期货进击系统.exe</OutputFile>
+      <ForceSymbolReferences>__tcmalloc</ForceSymbolReferences>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -204,6 +205,7 @@
     <ClInclude Include="CtpAPILibrary\ThostFtdcTraderApi.h" />
     <ClInclude Include="CtpAPILibrary\ThostFtdcUserApiDataType.h" />
     <ClInclude Include="CtpAPILibrary\ThostFtdcUserApiStruct.h" />
+    <ClInclude Include="CTPTimer.h" />
     <ClInclude Include="define.h" />
     <ClInclude Include="getconfig.h" />
     <ClInclude Include="HighSpeedChartCtrl\ChartAxis.h" />
@@ -254,6 +256,7 @@
     <ClCompile Include="CommonDef.cpp" />
     <ClCompile Include="CTP-MFC.cpp" />
     <ClCompile Include="CTP-MFCDlg.cpp" />
+    <ClCompile Include="CTPTimer.cpp" />
     <ClCompile Include="getconfig.cpp" />
     <ClCompile Include="HighSpeedChartCtrl\ChartAxis.cpp" />
     <ClCompile Include="HighSpeedChartCtrl\ChartAxisLabel.cpp" />
