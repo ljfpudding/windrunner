@@ -49,12 +49,38 @@ unsigned int __stdcall CTPTimerThreadProc(void * data)
 			WaitForSingleObject(hCTPTimerCloseSignal, ulInterval);
 			
 		}
-		else if ((local.tm_hour == 15 && local.tm_min == 28)) //15:28关闭， 等到晚上20:56分开启 
+		else if ((local.tm_hour == 13 && local.tm_min == 26))
+		{
+			unsigned long ulInterval = 1000; //1秒
+			ulInterval = ulInterval * 60 * 60;//1小时
+			ulInterval = ulInterval * 2; //5小时
+			//ulInterval = ulInterval + 1000 * 60 * 40;//5小时+30 +10分钟;
+
+			unsigned int nType = CTPTimerEnum::STARTWORK;
+			theApp.GetMainWnd()->PostMessage(WM_CTP_TIMER, nType, 0);
+			WaitForSingleObject(hCTPTimerCloseSignal, ulInterval);
+
+		}
+		else if ((local.tm_hour == 15 && local.tm_min == 33)) //15:33关闭， 等到晚上20:56分开启 
 		{
 			unsigned long ulInterval = 1000; //1秒
 			ulInterval = ulInterval * 60 * 60;//1小时
 			ulInterval = ulInterval * 5; //5小时
 			ulInterval = ulInterval + 1000 * 60 * 15;//5小时+15分钟;	
+
+			unsigned int nType = CTPTimerEnum::STOPWORK;
+			theApp.GetMainWnd()->PostMessage(WM_CTP_TIMER, nType, 0);
+
+			WaitForSingleObject(hCTPTimerCloseSignal, ulInterval);
+
+		}
+		else if ((local.tm_hour == 11 && local.tm_min == 33))
+		{
+
+			unsigned long ulInterval = 1000; //1秒
+			ulInterval = ulInterval * 60 * 60;//1小时
+			ulInterval = ulInterval * 2; //2小时
+			ulInterval = ulInterval -10*1000*60 ;//2小时-10分钟;	
 
 			unsigned int nType = CTPTimerEnum::STOPWORK;
 			theApp.GetMainWnd()->PostMessage(WM_CTP_TIMER, nType, 0);

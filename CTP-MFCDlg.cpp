@@ -392,8 +392,9 @@ void CCTPMFCDlg::OnBnClickedBtnMdClose()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	SetEvent(CloseSignalReady);	
-	Sleep(2000);
-
+	Sleep(200);
+	SetEvent(CloseSignalReady);
+	Sleep(100);
 
 	CloseHandle(hFetchMD);
 	CloseHandle(hWriteData);

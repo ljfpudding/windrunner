@@ -273,3 +273,7 @@ enum CTPTimerEnum
 {
 	STARTWORK,STOPWORK
 };
+
+
+
+extern void ShowMessageToDlg(string str);

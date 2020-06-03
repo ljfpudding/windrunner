@@ -8,19 +8,6 @@
 CVolumeIndicatorMDApi  *pUserMdApi = NULL;
 int nRequestID = 0;
 
-void PostMessageToDlg(PARAMTOCHARTS &param)
-{
-	PARAMTOCHARTS *paramTrans = new PARAMTOCHARTS;
-	memset(paramTrans, 0, sizeof(PARAMTOCHARTS));
-	{
-		paramTrans->dwprice = param.dwprice;
-		paramTrans->nGap = param.nGap;
-		paramTrans->strMessage = param.strMessage;
-		paramTrans->nIndex = param.nIndex;
-	}
-	
-	theApp.GetMainWnd()->PostMessageW(WM_MYMSG, (WPARAM)paramTrans, 0);
-}
 
 void LoginActionPostMessage(int LoginType, int LoginCount, CVolumeIndicatorMDSpi *pSpi=NULL)
 {
@@ -43,11 +30,7 @@ void LoginActionPostMessage(int LoginType, int LoginCount, CVolumeIndicatorMDSpi
 		str = "ConDisconnect so,Fire Login  at" + curtimestr + "!";
 	}
 
-	PARAMTOCHARTS paramTrans;
-	memset(&paramTrans, 0, sizeof(PARAMTOCHARTS));
-	paramTrans.strMessage = str;	
-	
-	PostMessageToDlg(paramTrans);
+	ShowMessageToDlg(str);
 
 	int nLoginResult = pSpi->ReqUserLogin();
 	if (!nLoginResult)
@@ -68,10 +51,7 @@ void LoginActionPostMessage(int LoginType, int LoginCount, CVolumeIndicatorMDSpi
 			str = "ConDisconnect so,Fire Login  at" + curtimestr + "  Successful!";
 		}
 
-		PARAMTOCHARTS paramTrans;
-		memset(&paramTrans, 0, sizeof(PARAMTOCHARTS));
-		paramTrans.strMessage = str;
-		PostMessageToDlg(paramTrans);
+		ShowMessageToDlg(str);
 	}
 	else
 	{
@@ -92,10 +72,7 @@ void LoginActionPostMessage(int LoginType, int LoginCount, CVolumeIndicatorMDSpi
 			str = "ConDisconnect so,Fire Login Subscribe at" + curtimestr + " Failed!";
 		}
 
-		PARAMTOCHARTS paramTrans;
-		memset(&paramTrans, 0, sizeof(PARAMTOCHARTS));
-		paramTrans.strMessage = str;
-		PostMessageToDlg(paramTrans);
+		ShowMessageToDlg(str);
 	}
 }
 
@@ -120,10 +97,7 @@ void SubscribeActionPostMessage(int LoginType, int LoginCount, CVolumeIndicatorM
 		str = "ConDisconnect so,Fire  Subscribe at" + curtimestr + "!";
 	}
 
-	PARAMTOCHARTS paramTrans;
-	memset(&paramTrans, 0, sizeof(PARAMTOCHARTS));
-	paramTrans.strMessage = str;
-	PostMessageToDlg(paramTrans);
+	ShowMessageToDlg(str);
 
 	int nLoginResult = pSpi->SubscribeMarketData();
 	if (!nLoginResult)
@@ -144,10 +118,7 @@ void SubscribeActionPostMessage(int LoginType, int LoginCount, CVolumeIndicatorM
 			str = "ConDisconnect so,Fire  Subscribe at" + curtimestr + "  Successful!";
 		}
 
-		PARAMTOCHARTS paramTrans;
-		memset(&paramTrans, 0, sizeof(PARAMTOCHARTS));
-		paramTrans.strMessage = str;
-		PostMessageToDlg(paramTrans);
+		ShowMessageToDlg(str);
 	}
 	else
 	{
@@ -168,10 +139,7 @@ void SubscribeActionPostMessage(int LoginType, int LoginCount, CVolumeIndicatorM
 			str = "ConDisconnect so, Login Subscribe at" + curtimestr + " Failed!";
 		}
 
-		PARAMTOCHARTS paramTrans;
-		memset(&paramTrans, 0, sizeof(PARAMTOCHARTS));
-		paramTrans.strMessage = str;
-		PostMessageToDlg(paramTrans);
+		ShowMessageToDlg(str);
 	}
 
 
@@ -229,19 +197,15 @@ unsigned int __stdcall fetchMDThreadProc(void * data)
 	if (pUserMdApi == NULL)
 	{
 		string str = "Create UDP MD API Failed!";
-		PARAMTOCHARTS paramTrans;
-		memset(&paramTrans, 0, sizeof(PARAMTOCHARTS));
-		paramTrans.strMessage = str;
-		PostMessageToDlg(paramTrans);
+		ShowMessageToDlg(str);
 	}
 	else
 	{
 		string str = "Create UDP MD API Successful!";
-		PARAMTOCHARTS paramTrans;
-		memset(&paramTrans, 0, sizeof(PARAMTOCHARTS));
-		paramTrans.strMessage = str;
-		PostMessageToDlg(paramTrans);
+		ShowMessageToDlg(str);
 	}
+
+
 
 	CVolumeIndicatorMDSpi ash(pUserMdApi);
 	pUserMdApi->RegisterSpi(&ash);
@@ -251,6 +215,8 @@ unsigned int __stdcall fetchMDThreadProc(void * data)
 
 	if (::WaitForSingleObject(hMDThreadToStartSignalReady, 1000 * 60) == WAIT_TIMEOUT)//超时一分钟，针对服务器没有开的情况
 	{
+
+
 		WaitForSingleObject(CloseSignalReady, INFINITE);
 
 		pUserMdApi->Release();
@@ -271,10 +237,8 @@ unsigned int __stdcall fetchMDThreadProc(void * data)
 	WaitForSingleObject(CloseSignalReady, INFINITE);
 	pUserMdApi->Release();
 
-	PARAMTOCHARTS paramTrans;
-	memset(&paramTrans, 0, sizeof(PARAMTOCHARTS));
-	paramTrans.strMessage = "fetchMDThreadProc Thread terminate!";
-	PostMessageToDlg(paramTrans);
+	string str= "fetchMDThreadProc Thread terminate!";
+	ShowMessageToDlg(str);
 
 	_endthreadex(0);
 
@@ -285,14 +249,16 @@ unsigned int __stdcall fetchMDThreadProc(void * data)
 void writeCSVfile()
 {
 	string strpath = string(targetpath);
-	BOOL isPath = false;
-	
-	//WaitForSingleObject(SubscribeSignalReady, INFINITE);
+	BOOL isPath = false;	
 	
 	if (strpath=="")
 		isPath = false;
 	else
 		isPath = true;
+
+
+	if(g_vcInstrumentIDFilterStr.size()==0)
+		ShowMessageToDlg(string("g_vcInstrumentIDFilterStr size is zero"));
 
 
 	for (int i = 0; i < g_vcInstrumentIDFilterStr.size(); i++)
@@ -315,88 +281,95 @@ void writeCSVfile()
 		std::ofstream outFile;
 		outFile.open(m_chMdcsvFileName, std::ios::_Noreplace); // 新开文件
 
-		map<string, string>::iterator itor;
-		itor = g_mapSHFEInstrument.find(g_vcInstrumentIDFilterStr[i]);
-		if (itor != g_mapSHFEInstrument.end())//SHFE 上海合约 5档行情
+		if (outFile.is_open())
 		{
-			outFile
-				<< "合约代码" << ","
-				//<<"交易日"<<","
-				//<< "上次结算价" << ","
-				//<< "昨持仓量" << ","
-				//<< "涨停板价" << ","
-				//<< "跌停板价" << ","
-				//<< "今开盘" << ","
-				//<< "最高价" << ","
-				//<< "最低价" << ","
-				<< "最后修改时间" << ","
-				<< "最后修改毫秒" << ","
-				<< "最新价" << ","
-				<< "数量" << ","
-				//<< "成交金额" << ","
-				<< "持仓量" << ","
-				//<< "今收盘" << ","
-				//<< "本次结算价" << ","
-				<< "申买价一" << ","
-				<< "申买量一" << ","
-				<< "申卖价一" << ","
-				<< "申卖量一" << ","
-						  //<< "现手" << ","
-						  //<< "增仓" << ","
-						  //<< "方向"
-				<< "申买价二" << ","
-				<< "申买量二" << ","
-				<< "申卖价二" << ","
-				<< "申卖量二" << ","
+			map<string, string>::iterator itor;
+			itor = g_mapSHFEInstrument.find(g_vcInstrumentIDFilterStr[i]);
+			if (itor != g_mapSHFEInstrument.end())//SHFE 上海合约 5档行情
+			{
+				outFile
+					<< "合约代码" << ","
+					//<<"交易日"<<","
+					//<< "上次结算价" << ","
+					//<< "昨持仓量" << ","
+					//<< "涨停板价" << ","
+					//<< "跌停板价" << ","
+					//<< "今开盘" << ","
+					//<< "最高价" << ","
+					//<< "最低价" << ","
+					<< "最后修改时间" << ","
+					<< "最后修改毫秒" << ","
+					<< "最新价" << ","
+					<< "数量" << ","
+					//<< "成交金额" << ","
+					<< "持仓量" << ","
+					//<< "今收盘" << ","
+					//<< "本次结算价" << ","
+					<< "申买价一" << ","
+					<< "申买量一" << ","
+					<< "申卖价一" << ","
+					<< "申卖量一" << ","
+					//<< "现手" << ","
+					//<< "增仓" << ","
+					//<< "方向"
+					<< "申买价二" << ","
+					<< "申买量二" << ","
+					<< "申卖价二" << ","
+					<< "申卖量二" << ","
 
-				<< "申买价三" << ","
-				<< "申买量三" << ","
-				<< "申卖价三" << ","
-				<< "申卖量三" << ","
+					<< "申买价三" << ","
+					<< "申买量三" << ","
+					<< "申卖价三" << ","
+					<< "申卖量三" << ","
 
 
-				<< "申买价四" << ","
-				<< "申买量四" << ","
-				<< "申卖价四" << ","
-				<< "申卖量四" << ","
+					<< "申买价四" << ","
+					<< "申买量四" << ","
+					<< "申卖价四" << ","
+					<< "申卖量四" << ","
 
-				<< "申买价五" << ","
-				<< "申买量五" << ","
-				<< "申卖价五" << ","
-				<< "申卖量五" << std::endl;
+					<< "申买价五" << ","
+					<< "申买量五" << ","
+					<< "申卖价五" << ","
+					<< "申卖量五" << std::endl;
+			}
+			else
+			{
+				outFile
+					<< "合约代码" << ","
+					//<<"交易日"<<","
+					//<< "上次结算价" << ","
+					//<< "昨持仓量" << ","
+					//<< "涨停板价" << ","
+					//<< "跌停板价" << ","
+					//<< "今开盘" << ","
+					//<< "最高价" << ","
+					//<< "最低价" << ","
+					<< "最后修改时间" << ","
+					<< "最后修改毫秒" << ","
+					<< "最新价" << ","
+					<< "数量" << ","
+					//<< "成交金额" << ","
+					<< "持仓量" << ","
+					//<< "今收盘" << ","
+					//<< "本次结算价" << ","
+					<< "申买价一" << ","
+					<< "申买量一" << ","
+					<< "申卖价一" << ","
+					<< "申卖量一" //<< ","
+							  //<< "现手" << ","
+							  //<< "增仓" << ","
+							  //<< "方向"
+					<< std::endl;
+			}
+
+			outFile.close();
+			gmap_FilepathInstrument.insert(pair<string, string>(g_vcInstrumentIDFilterStr[i], string(m_chMdcsvFileName)));
 		}
 		else
 		{
-			outFile
-				<< "合约代码" << ","
-				//<<"交易日"<<","
-				//<< "上次结算价" << ","
-				//<< "昨持仓量" << ","
-				//<< "涨停板价" << ","
-				//<< "跌停板价" << ","
-				//<< "今开盘" << ","
-				//<< "最高价" << ","
-				//<< "最低价" << ","
-				<< "最后修改时间" << ","
-				<< "最后修改毫秒" << ","
-				<< "最新价" << ","
-				<< "数量" << ","
-				//<< "成交金额" << ","
-				<< "持仓量" << ","
-				//<< "今收盘" << ","
-				//<< "本次结算价" << ","
-				<< "申买价一" << ","
-				<< "申买量一" << ","
-				<< "申卖价一" << ","
-				<< "申卖量一" //<< ","
-						  //<< "现手" << ","
-						  //<< "增仓" << ","
-						  //<< "方向"
-				<< std::endl;
+
 		}
-		
-		outFile.close();
-		gmap_FilepathInstrument.insert(pair<string, string>(g_vcInstrumentIDFilterStr[i], string(m_chMdcsvFileName)));
 	}
 }
 
@@ -447,56 +420,82 @@ void writeTickDataCSVFile()
 				{
 					std::ofstream outFile;
 					outFile.open(itor->second.c_str(), std::ios::app); // 文件追加写入 
-					outFile << structTickData.cInstrumentID << ","
-						<< structTickData.cUpdatetime << ","     //最后修改时间
-						<< structTickData.iMilitime << ","  //毫秒
-						<< structTickData.dwLastPrice << ","   //最新价
-						<< structTickData.iVolume << ","  //数量
-						<< structTickData.dwOpenInterest << ","  //持仓量
-						<< structTickData.dwBidPrice1 << ","    //买一价
-						<< structTickData.iBidVolume1 << ","   //买一量
-						<< structTickData.dwAskPrice1 << ","   //卖一价
-						<< structTickData.iAskVolume1 << ","     //卖一量
 
-						<< structTickData.dwBidPrice2 << ","    //买二价
-						<< structTickData.iBidVolume2 << ","   //买二量
-						<< structTickData.dwAskPrice2 << ","   //卖二价
-						<< structTickData.iAskVolume2 << ","     //卖二量
+					if (outFile.is_open())
+					{
+						outFile << structTickData.cInstrumentID << ","
+							<< structTickData.cUpdatetime << ","     //最后修改时间
+							<< structTickData.iMilitime << ","  //毫秒
+							<< structTickData.dwLastPrice << ","   //最新价
+							<< structTickData.iVolume << ","  //数量
+							<< structTickData.dwOpenInterest << ","  //持仓量
+							<< structTickData.dwBidPrice1 << ","    //买一价
+							<< structTickData.iBidVolume1 << ","   //买一量
+							<< structTickData.dwAskPrice1 << ","   //卖一价
+							<< structTickData.iAskVolume1 << ","     //卖一量
 
-						<< structTickData.dwBidPrice3 << ","    //买三价
-						<< structTickData.iBidVolume3 << ","   //买三量
-						<< structTickData.dwAskPrice3 << ","   //卖三价
-						<< structTickData.iAskVolume3 << ","     //卖三量
+							<< structTickData.dwBidPrice2 << ","    //买二价
+							<< structTickData.iBidVolume2 << ","   //买二量
+							<< structTickData.dwAskPrice2 << ","   //卖二价
+							<< structTickData.iAskVolume2 << ","     //卖二量
 
-						<< structTickData.dwBidPrice4 << ","    //买四价
-						<< structTickData.iBidVolume4 << ","   //买四量
-						<< structTickData.dwAskPrice4 << ","   //卖四价
-						<< structTickData.iAskVolume4 << ","     //卖四量
+							<< structTickData.dwBidPrice3 << ","    //买三价
+							<< structTickData.iBidVolume3 << ","   //买三量
+							<< structTickData.dwAskPrice3 << ","   //卖三价
+							<< structTickData.iAskVolume3 << ","     //卖三量
 
-						<< structTickData.dwBidPrice5 << ","    //买五价
-						<< structTickData.iBidVolume5 << ","   //买五量
-						<< structTickData.dwAskPrice5 << ","   //卖五价
-						<< structTickData.iAskVolume5       //卖五量
-						<< std::endl;
-					outFile.close();
+							<< structTickData.dwBidPrice4 << ","    //买四价
+							<< structTickData.iBidVolume4 << ","   //买四量
+							<< structTickData.dwAskPrice4 << ","   //卖四价
+							<< structTickData.iAskVolume4 << ","     //卖四量
+
+							<< structTickData.dwBidPrice5 << ","    //买五价
+							<< structTickData.iBidVolume5 << ","   //买五量
+							<< structTickData.dwAskPrice5 << ","   //卖五价
+							<< structTickData.iAskVolume5       //卖五量
+							<< std::endl;
+						outFile.close();
+
+					}
+					else
+					{
+
+
+					}
+
+
 
 				}
 				else
 				{
 					std::ofstream outFile;
 					outFile.open(itor->second.c_str(), std::ios::app); // 文件追加写入 
-					outFile << structTickData.cInstrumentID << ","
-						<< structTickData.cUpdatetime << ","     //最后修改时间
-						<< structTickData.iMilitime << ","  //毫秒
-						<< structTickData.dwLastPrice << ","   //最新价
-						<< structTickData.iVolume << ","  //数量
-						<< structTickData.dwOpenInterest << ","  //持仓量
-						<< structTickData.dwBidPrice1 << ","    //买一价
-						<< structTickData.iBidVolume1 << ","   //买一量
-						<< structTickData.dwAskPrice1 << ","   //卖一价
-						<< structTickData.iAskVolume1       //卖一量
-						<< std::endl;
-					outFile.close();
+
+
+					if (outFile.is_open())
+					{
+						outFile << structTickData.cInstrumentID << ","
+							<< structTickData.cUpdatetime << ","     //最后修改时间
+							<< structTickData.iMilitime << ","  //毫秒
+							<< structTickData.dwLastPrice << ","   //最新价
+							<< structTickData.iVolume << ","  //数量
+							<< structTickData.dwOpenInterest << ","  //持仓量
+							<< structTickData.dwBidPrice1 << ","    //买一价
+							<< structTickData.iBidVolume1 << ","   //买一量
+							<< structTickData.dwAskPrice1 << ","   //卖一价
+							<< structTickData.iAskVolume1       //卖一量
+							<< std::endl;
+						outFile.close();
+
+					}
+					else
+					{
+
+
+
+					}
+
+
 				}
 			}
 		}
@@ -725,8 +724,13 @@ void writeTickDatatoCSVFile()
 unsigned int __stdcall writeDataThreadProc(void * data)
 {
 
-	if (::WaitForSingleObject(writeFileNameSignalReady, 1000 * 60) == WAIT_TIMEOUT)//超时一分钟，针对服务器没有开的情况
+	ShowMessageToDlg(string("writeDataThreadProc start!"));
+
+	if (::WaitForSingleObject(writeFileNameSignalReady, 1000 * 60 * 6) == WAIT_TIMEOUT)//超时六分钟，针对服务器没有开的情况
 	{
+
+		ShowMessageToDlg(string("writeFileNameSignalReady timeout!"));
+
 		WaitForSingleObject(CloseSignalReady, INFINITE);
 		_endthreadex(0);
 		return 0;

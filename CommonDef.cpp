@@ -1,6 +1,9 @@
 #include "stdafx.h"
 #include "CommonDef.h"
 
+#include "CTP-MFC.h"
+#include "CTP-MFCDlg.h"
+
 
 using namespace moodycamel;
 using namespace std;
@@ -290,4 +293,36 @@ void ClearCTPData()
 
 	}
 
+}
+
+void PostMessageToDlg(PARAMTOCHARTS &param)
+{
+	PARAMTOCHARTS *paramTrans = new PARAMTOCHARTS;
+	memset(paramTrans, 0, sizeof(PARAMTOCHARTS));
+	{
+		paramTrans->dwprice = param.dwprice;
+		paramTrans->nGap = param.nGap;
+		paramTrans->strMessage = param.strMessage;
+		paramTrans->nIndex = param.nIndex;
+	}
+
+	theApp.GetMainWnd()->PostMessageW(WM_MYMSG, (WPARAM)paramTrans, 0);
+}
+
+
+void ShowMessageToDlg(string str)
+{
+	PARAMTOCHARTS param;
+	memset(&param, 0, sizeof(PARAMTOCHARTS));
+	
+
+	time_t currtime;
+	struct tm *mt = NULL;
+	time(&currtime);
+	mt = localtime(&currtime);
+	string curtimestr = asctime(localtime(&currtime));
+
+	param.strMessage = curtimestr + " : " + str;
+
+	PostMessageToDlg(param);
 }

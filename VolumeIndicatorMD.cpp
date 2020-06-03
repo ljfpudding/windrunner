@@ -69,10 +69,6 @@ int  CVolumeIndicatorMDSpi::SubscribeMarketData()
 		}
 	}
 
-
-
-
-
 /*
 
 
@@ -109,7 +105,6 @@ int result = m_pUserMdApi->SubscribeMarketData(ppInstrumentID, count2);
 
 
 */
-
 
 	return 0;
 }
@@ -153,7 +148,9 @@ void CVolumeIndicatorMDSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUser
 			if (_access(targetpath, 0) == -1)
 			{
 				_mkdir(targetpath);
-				//SetEvent(MkdirSignalReady);
+				
+				string str = "OnRspUserLogin _mkdir";
+				ShowMessageToDlg(str);
 			}
 			SetEvent(SubscribeSignalReady);
 			//memset(&m_preTickData, 0, sizeof(MDTICKDATA)); //再次登录的时候,重置这个pre.
@@ -169,13 +166,17 @@ void CVolumeIndicatorMDSpi::OnRspSubMarketData(CThostFtdcSpecificInstrumentField
 		{
 			strcpy_s(g_chInstrumentIDFilestr, pSpecificInstrument->InstrumentID);			
 			g_vcInstrumentIDFilterStr.push_back(g_chInstrumentIDFilestr);
-					
+			ShowMessageToDlg(string("OnRspSubMarketData start add instrument"));					
 		}
 
 		if (bIsLast)
 		{
 			theApp.GetMainWnd()->PostMessageW(WM_HEYUEPREPARED, 0, 0);
+			
 			SetEvent(writeFileNameSignalReady);
+
+			ShowMessageToDlg(string("OnRspSubMarketData bIsLast  SetEvent writeFileNameSignalReady"));
+
 			SetEvent(ReceiveDepDataSignalReady);			
 		}
 	}
